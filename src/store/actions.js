@@ -24,5 +24,20 @@ export default {
     } else {
       return Promise.resolve()
     }
+  },
+
+  lookup: ({commit, state}, {ref, type}) => {
+    ref.get().then(function (doc) {
+      console.log(doc.id, ' => ', doc.data())
+      commit('SET_ITEMS', data);
+    })
+  },
+
+  query: ({commit, state}, {ref}) => {
+    ref.get().then(function (docs) {
+      docs.forEach(function (doc) {
+        console.log(doc.id, ' => ', doc.data())
+      })
+    })
   }
 }

@@ -22,8 +22,9 @@
 <script>
   import { mapState, mapActions } from 'vuex'
   import { log } from '../../helper'
-  import firebase, { store } from '../../firebase-app'
   import ImageUpload from '../elements/ImageUpload'
+  import * as firebase from 'firebase'
+  import 'firebase/firestore'
 
   export default {
     props: ['isNew'],
@@ -86,12 +87,13 @@
           return
         }
         const place = {
+          accountId: this.accountId,
           published: this.published,
           title: this.title
         }
-        store(this.accountId, this.placeId, 'places', place, this.imageRemoved, this.imageFile).then(function (ref) {
+        firebase.firestore().collection('places').add(place).then(function (ref) {
           this.$router.push('/account/place/' + ref.key)
-        }.bind(this)).catch(log())
+        }.bind(this)).catch(log)
       }
     },
     watch: {

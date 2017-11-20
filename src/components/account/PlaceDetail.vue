@@ -15,7 +15,8 @@
 <script>
   import { mapState, mapActions } from 'vuex'
   import { log } from '../../helper'
-  import firebase, { store } from '../../firebase-app'
+  import * as firebase from 'firebase'
+  import 'firebase/firestore'
 
   export default {
     created () {
@@ -41,9 +42,10 @@
       }
     },
     methods: {
-      ...mapActions(['setRef']),
+      ...mapActions(['setRef', 'lookup']),
 
       init () {
+        this.lookup({ ref: firebase.firestore().collection('places').doc(this.placeId) })
         if (this.accountId) {
           this.setRef({
             key: 'accountPlace',
@@ -52,10 +54,10 @@
         }
       },
       togglePublished (published) {
-        if (!this.accountId) {
-          return
-        }
-        store(this.accountId, this.placeId, 'places', {published: published}).catch(log())
+//        if (!this.accountId) {
+//          return
+//        }
+//        store(this.accountId, this.placeId, 'places', {published: published}).catch(log())
       },
       removePlace () {
         if (!this.accountId) {
