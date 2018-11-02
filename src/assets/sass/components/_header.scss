@@ -17,12 +17,12 @@ header.main {
     width: $module-size;
     height: $module-size;
     padding: 0 !important;
-    background: $logo-bg-color url("/static/img/pxflux-logo-X-ico.png") no-repeat;
+    background: $logo-bg-color url("/img/pxflux-logo-X-ico.png") no-repeat;
     background-size: 0;
 
     @include weider-then-phone() {
       width: round($module-size * 2.5);
-      background: $logo-bg-color url("/static/img/pxflux-logo-Xc.png") no-repeat;
+      background: $logo-bg-color url("/img/pxflux-logo-Xc.png") no-repeat;
       background-size: 0;
     }
     canvas {

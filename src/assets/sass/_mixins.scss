@@ -36,18 +36,18 @@
   transform: translate(0, -50% + $y-shift);
 }
 
-@mixin checker-bg ($color:#1a1a1a, $size: $module-size/4, $url:"/static/img/checker-12-tr@1x.png"){
+@mixin checker-bg($color:#1a1a1a, $size: $module-size/4, $url:"/img/checker-12-tr@1x.png") {
   background: $color url($url) repeat fixed 0 0;
   background-size: $size;
 }
 @mixin checker-bg-20 ($color:#1a1a1a, $size: $module-size/4 ){
-  @include checker-bg($color, $size, "/static/img/checker-12-tr20@2x.png");
+  @include checker-bg($color, $size, "/img/checker-12-tr20@2x.png");
 }
 @mixin checker-bg-10 ($color:#1a1a1a, $size: $module-size/4 ){
-  @include checker-bg($color, $size, "/static/img/checker-48-tr10@2x.png");
+  @include checker-bg($color, $size, "/img/checker-48-tr10@2x.png");
 }
 @mixin checker-bg-5 ($color:#1a1a1a, $size: $module-size/4 ){
-  @include checker-bg($color, $size, "/static/img/checker-48-tr5@2x.png");
+  @include checker-bg($color, $size, "/img/checker-48-tr5@2x.png");
 }
 
 @mixin weider-then-iphon5 (){

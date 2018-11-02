@@ -1,35 +1,27 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue'
-import { createApp } from './init'
-import ProgressBar from './components/elements/ProgressBar'
-import firebaseApp from './firebase-app'
-import inputAutoWidth from 'vue-input-autowidth'
-import VueScrollTo from 'vue-scrollto'
+import Vue from "vue";
+import ProgressBar from "./components/elements/ProgressBar";
+import firebaseApp from "./firebase-app";
+import inputAutoWidth from "vue-input-autowidth";
+import VueScrollTo from "vue-scrollto";
+import { sync } from "vuex-router-sync";
+import App from "./components/App";
+import store from "./store";
+import router from "./router";
+
+Vue.config.productionTip = false;
 
 // global progress bar
-const bar = Vue.prototype.$bar = new Vue(ProgressBar).$mount()
-document.body.appendChild(bar.$el)
+const bar = (Vue.prototype.$bar = new Vue(ProgressBar).$mount());
+document.body.appendChild(bar.$el);
 
-// a global mixin that calls `asyncData` when a route component's params change
+Vue.use(inputAutoWidth);
+Vue.use(VueScrollTo);
+
 Vue.mixin({
-  beforeRouteUpdate (to, from, next) {
-    const {asyncData} = this.$options
-    if (asyncData) {
-      asyncData({
-        store: this.$store,
-        route: to
-      }).then(next).catch(next)
-    } else {
-      next()
-    }
+  created: function() {
+    this.$firebase = firebaseApp;
   }
-})
-
-Vue.use(inputAutoWidth)
-Vue.use(VueScrollTo)
-
-const {app, router, store} = createApp()
+});
 
 /**
  * Sync store.state.user with firebase.auth().currentUser
@@ -37,79 +29,79 @@ const {app, router, store} = createApp()
  * This callback is called when firebase.auth() detects user changes,
  * so just update the vuex store with the new user object.
  */
-let callback = null
-let userRef = null
+let callback = null;
+let userRef = null;
 firebaseApp.auth().onAuthStateChanged(user => {
-  console.log('onAuthStateChanged:', user)
+  console.log("onAuthStateChanged:", user);
   if (callback) {
-    userRef.off('value', callback)
+    userRef.off("value", callback);
   }
   if (user) {
-    userRef = firebaseApp.database().ref('metadata/' + user.uid + '/refreshTime')
-    callback = userRef.on('value', (snapshot) => {
-      console.log('onMetadataChanged:', snapshot)
+    userRef = firebaseApp
+      .database()
+      .ref("metadata/" + user.uid + "/refreshTime");
+    callback = userRef.on("value", snapshot => {
+      console.log("onMetadataChanged:", snapshot);
       if (!snapshot.exists()) {
-        return
+        return;
       }
-      return user.getIdToken(true).then((token) => {
-        store.commit('UPDATE_USER', {user: firebaseApp.auth().currentUser, account: firebaseApp.auth().currentUser})
-        // console.log('getIdToken:', token)
-        return JSON.parse(b64DecodeUnicode(token.split('.')[1]))
-      }).then(function (payload) {
-        if (!payload.hasOwnProperty('accountId')) {
-          throw new Error()
-        }
-        return firebaseApp.database().ref('accounts/' + payload.accountId).once('value')
-      }).then(function (snapshot) {
-        if (!snapshot.exists()) {
-          throw new Error()
-        }
-        const account = snapshot.val()
-        account['.key'] = snapshot.key
-        store.commit('UPDATE_USER', {user: user, account: account})
-      }).catch(function (error) {
-        console.log(error)
-        store.commit('UPDATE_USER', null)
-      })
-    })
+      return user
+        .getIdToken(true)
+        .then(token => {
+          store.commit("UPDATE_USER", {
+            user: firebaseApp.auth().currentUser,
+            account: firebaseApp.auth().currentUser
+          });
+          // console.log('getIdToken:', token)
+          return JSON.parse(b64DecodeUnicode(token.split(".")[1]));
+        })
+        .then(function(payload) {
+          if (!payload.hasOwnProperty("accountId")) {
+            throw new Error();
+          }
+          return firebaseApp
+            .database()
+            .ref("accounts/" + payload.accountId)
+            .once("value");
+        })
+        .then(function(snapshot) {
+          if (!snapshot.exists()) {
+            throw new Error();
+          }
+          const account = snapshot.val();
+          account[".key"] = snapshot.key;
+          store.commit("UPDATE_USER", { user: user, account: account });
+        })
+        .catch(function(error) {
+          console.log(error);
+          store.commit("UPDATE_USER", null);
+        });
+    });
   } else {
-    store.commit('UPDATE_USER', null)
+    store.commit("UPDATE_USER", null);
   }
-})
+});
 
-// wait until router has resolved all async before hooks and async components...
-router.onReady(() => {
-  // Add router hook for handling asyncData.
-  // Doing it after initial route is resolved so that we don't double-fetch
-  // the data that we already have. Using router.beforeResolve() so that all
-  // async components are resolved.
-  router.beforeResolve((to, from, next) => {
-    const matched = router.getMatchedComponents(to)
-    const prevMatched = router.getMatchedComponents(from)
-    let diffed = false
-    const activated = matched.filter((c, i) => {
-      return diffed || (diffed = (prevMatched[i] !== c))
-    })
-    const asyncDataHooks = activated.map(c => c.asyncData).filter(_ => _)
-    if (!asyncDataHooks.length) {
-      return next()
-    }
+/**
+ * Sync the router with the vuex store. This registers `store.state.route`
+ * (https://github.com/vuejs/vuex-router-sync/tree/next)
+ */
+sync(store, router);
 
-    bar.start()
-    Promise.all(asyncDataHooks.map(hook => hook({store, route: to})))
-      .then(() => {
-        bar.finish()
-        next()
+/* eslint-disable no-new */
+new Vue({
+  router,
+  store,
+  render: h => h(App)
+}).$mount("#app");
+
+function b64DecodeUnicode(str) {
+  return decodeURIComponent(
+    atob(str)
+      .split("")
+      .map(function(c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
       })
-      .catch(next)
-  })
-
-  // actually mount to DOM
-  app.$mount('#app')
-})
-
-function b64DecodeUnicode (str) {
-  return decodeURIComponent(atob(str).split('').map(function (c) {
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-  }).join(''))
+      .join("")
+  );
 }

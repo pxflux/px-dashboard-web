@@ -6,9 +6,9 @@
           <span>Setup</span>
         </label>
         <div class="tabs field">
-          <div v-for="(config, i) in setups" @click="setupIndex = i" class="tab"
+          <div v-for="(config, i) in setups" :key="i" @click="setupIndex = i" class="tab"
                :class="[setupIndex === i ? 'active': '']">
-            {{config.title||'Simple'}}
+            {{config.title||"Simple"}}
           </div>
           <div class="button frameless"><span class="icon plus" @click="addSetup()"></span></div>
           <div class="button frameless" v-if="setups.length > 1">
@@ -28,7 +28,7 @@
         </div>
         <div v-if="setupChannels.length" class="channels-tab-bar row">
           <label><span>Channels</span></label>
-          <div v-for="i in setupChannels.length"
+          <div v-for="i in setupChannels.length" :key="i"
                class="tab channel-tab"
                :class="[(i - 1) === channelIndex? 'active': '']"
                @click="selectChannel(i - 1)"
@@ -62,106 +62,115 @@
 </template>
 
 <script>
-  import { AWSetup, AWSetups } from '../../models/AWSetup'
-  import { AWChannel, AWChannels } from '../../models/AWChannel'
-  import VSelect from './UI/Select/components/Select'
-  import ImageAttachmentEditor from './ImageAttachmentEditor'
-  import VideoAttachmentEditor from './VideoAttachmentEditor'
-  import ChannelEditor from './sourse-editor/ChannelEditor'
+import { AWSetup, AWSetups } from "../../models/AWSetup";
+import { AWChannel, AWChannels } from "../../models/AWChannel";
+import ImageAttachmentEditor from "./ImageAttachmentEditor";
+import VideoAttachmentEditor from "./VideoAttachmentEditor";
+import ChannelEditor from "./sourse-editor/ChannelEditor";
 
-  export default {
-    name: 'artwork-setup-editor',
-    props: ['value'],
-    components: {
-      VSelect,
-      ImageAttachmentEditor,
-      VideoAttachmentEditor,
-      ChannelEditor
-    },
-    data () {
-      let setups = this.value.length ? this.value : [AWSetup.empty()]
-      return {
-        setups: setups,
-        setupIndex: 0,
-        scrolling: false,
-        renameConfigOpen: false,
-        channelIndex: 0
+export default {
+  name: "artwork-setup-editor",
+  props: ["value"],
+  components: {
+    ImageAttachmentEditor,
+    VideoAttachmentEditor,
+    ChannelEditor
+  },
+  data() {
+    let setups = this.value.length ? this.value : [AWSetup.empty()];
+    return {
+      setups: setups,
+      setupIndex: 0,
+      scrolling: false,
+      renameConfigOpen: false,
+      channelIndex: 0
+    };
+  },
+  computed: {
+    setupName: {
+      set(newValue) {
+        this.setups[this.setupIndex].title = newValue;
+        this.update();
+      },
+      get() {
+        return this.setups[this.setupIndex].title;
       }
     },
-    computed: {
-      setupName: {
-        set (newValue) {
-          this.setups[this.setupIndex].title = newValue
-          this.update()
-        },
-        get () { return this.setups[this.setupIndex].title }
-      },
-      setupChannels () {
-        let channels = this.setups[this.setupIndex].channels
-        return channels.length ? channels : [AWChannel.empty()]
+    setupChannels() {
+      let channels = this.setups[this.setupIndex].channels;
+      return channels.length ? channels : [AWChannel.empty()];
+    }
+  },
+  methods: {
+    // onScroll (e) {
+    //   this.$refs['channelEditor'].fixPanelsOnScroll(e)
+    // },
+    addSetup() {
+      AWSetups.append(this.setups);
+      this.selectSetup(this.setups.length);
+      this.update();
+    },
+    removeSetup() {
+      AWSetups.remove(this.setups, this.setupIndex);
+      this.selectSetup(this.setupIndex - 1);
+      this.update();
+    },
+    selectSetup(index) {
+      if (index < 0) {
+        this.setupIndex = 0;
+      } else if (index >= this.setups.length) {
+        this.setupIndex = this.setups.length - 1;
+      } else {
+        this.setupIndex = index;
       }
     },
-    methods: {
-      // onScroll (e) {
-      //   this.$refs['channelEditor'].fixPanelsOnScroll(e)
-      // },
-      addSetup () {
-        AWSetups.append(this.setups)
-        this.selectSetup(this.setups.length)
-        this.update()
-      },
-      removeSetup () {
-        AWSetups.remove(this.setups, this.setupIndex)
-        this.selectSetup(this.setupIndex - 1)
-        this.update()
-      },
-      selectSetup (index) {
-        if (index < 0) {
-          this.setupIndex = 0
-        } else if (index >= this.setups.length) {
-          this.setupIndex = this.setups.length - 1
-        } else {
-          this.setupIndex = index
-        }
-      },
-      addChannel () {
-        AWChannels.append(this.setups[this.setupIndex].channels)
-        this.selectChannel(this.setups[this.setupIndex].channels.length)
-        this.$nextTick(() => {
-          this.$scrollTo('#' + this.channelID(this.channelIndex), {container: '#channels-container', x: true, y: false})
-        })
-      },
-      setChannel (index, event) {
-        this.setups[this.setupIndex].channels[index] = event
-        this.update()
-      },
-      removeChannel (index) {
-        AWChannels.remove(this.setups[this.setupIndex].channels, index)
-        this.selectChannel(index - 1)
-        this.update()
-      },
-      selectChannel (index) {
-        if (index < 0) {
-          this.channelIndex = 0
-        } else if (index >= this.setups[this.setupIndex].channels.length) {
-          this.channelIndex = this.setups[this.setupIndex].channels.length - 1
-        } else {
-          this.channelIndex = index
-        }
-      },
-      update () {
-        this.$emit('input', AWSetups.fromJson(JSON.parse(JSON.stringify(this.setups))))
-      },
-      channelID (index) { return 'ch' + index }
+    addChannel() {
+      AWChannels.append(this.setups[this.setupIndex].channels);
+      this.selectChannel(this.setups[this.setupIndex].channels.length);
+      this.$nextTick(() => {
+        this.$scrollTo("#" + this.channelID(this.channelIndex), {
+          container: "#channels-container",
+          x: true,
+          y: false
+        });
+      });
     },
-    watch: {
-      value: function () {
-        if (Array.isArray(this.value) && this.value.length > 0) {
-          this.setups = this.value
-        } else {
-          this.setups = [AWSetup.empty()]
-        }
+    setChannel(index, event) {
+      this.setups[this.setupIndex].channels[index] = event;
+      this.update();
+    },
+    removeChannel(index) {
+      AWChannels.remove(this.setups[this.setupIndex].channels, index);
+      this.selectChannel(index - 1);
+      this.update();
+    },
+    selectChannel(index) {
+      if (index < 0) {
+        this.channelIndex = 0;
+      } else if (index >= this.setups[this.setupIndex].channels.length) {
+        this.channelIndex = this.setups[this.setupIndex].channels.length - 1;
+      } else {
+        this.channelIndex = index;
+      }
+    },
+    update() {
+      this.$emit(
+        "input",
+        AWSetups.fromJson(JSON.parse(JSON.stringify(this.setups)))
+      );
+    },
+    channelID(index) {
+      return "ch" + index;
+    }
+  },
+  watch: {
+    value: function() {
+      if (Array.isArray(this.value) && this.value.length > 0) {
+        this.setups = this.value;
+      } else {
+        this.setups = [AWSetup.empty()];
       }
     }
   }
+};
 </script>

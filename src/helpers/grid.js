@@ -4,88 +4,90 @@
  */
 
 export default {
-  data () {
+  data() {
     return {
-      placeholderClass: 'grid-cell-placeholder',
+      placeholderClass: "grid-cell-placeholder",
       gridContainer: null,
       cellPlaceholders: null,
       gridCells: [],
       gridCellStyle: null
-    }
+    };
   },
   methods: {
     /**
      * @param {string} gridClass
      */
-    setGridElements (gridClass) {
-      this.gridContainer = document.getElementsByClassName(gridClass)[ 0 ]
+    setGridElements(gridClass) {
+      this.gridContainer = document.getElementsByClassName(gridClass)[0];
       if (!this.gridContainer) {
-        this.gridCells = []
-        return
+        this.gridCells = [];
+        return;
       }
-      this.gridCells = this.gridContainer.children
+      this.gridCells = this.gridContainer.children;
     },
 
-    removePlaceholdersFromGrid (numToKeep) {
+    removePlaceholdersFromGrid(numToKeep) {
       if (!this.cellPlaceholders) {
-        this.cellPlaceholders = document.getElementsByClassName(this.placeholderClass)
+        this.cellPlaceholders = document.getElementsByClassName(
+          this.placeholderClass
+        );
       }
-      const numToRemove = this.cellPlaceholders.length - numToKeep
+      const numToRemove = this.cellPlaceholders.length - numToKeep;
       if (numToRemove < 1) {
-        return Math.abs(numToRemove)
+        return Math.abs(numToRemove);
       }
       for (let i = numToRemove - 1; i >= 0; i--) {
-        const el = this.cellPlaceholders[ i ]
-        el.parentNode.removeChild(el)
+        const el = this.cellPlaceholders[i];
+        el.parentNode.removeChild(el);
       }
-      return 0
+      return 0;
     },
 
-    addPlaceholdersToGrid (numToAdd) {
+    addPlaceholdersToGrid(numToAdd) {
       if (numToAdd) {
         if (!this.gridContainer) {
-          this.gridContainer = document.getElementById('main-grid')
+          this.gridContainer = document.getElementById("main-grid");
           if (!this.gridContainer) {
-            return
+            return;
           }
         }
         for (let i = 0; i < numToAdd; i++) {
-          let placeholder = document.createElement('div')
-          placeholder.className = this.placeholderClass
-          this.gridContainer.appendChild(placeholder)
+          let placeholder = document.createElement("div");
+          placeholder.className = this.placeholderClass;
+          this.gridContainer.appendChild(placeholder);
         }
       }
     },
     /**
      * @param {string=} gridClass
      */
-    fillEmptySpaceInGrid (gridClass) {
-      if (typeof gridClass === 'string') {
-        this.setGridElements(gridClass)
+    fillEmptySpaceInGrid(gridClass) {
+      if (typeof gridClass === "string") {
+        this.setGridElements(gridClass);
       }
       if (!this.gridCells.length) {
-        return
+        return;
       }
       if (!this.gridCellStyle) {
-        this.gridCellStyle = getComputedStyle(this.gridCells[ 0 ], null)
+        this.gridCellStyle = getComputedStyle(this.gridCells[0], null);
       }
 
-      const cellW = parseFloat(this.gridCellStyle.getPropertyValue('width'))
-      const winW = window.innerWidth
-      const numArtworks = this.gridCells.length
+      const cellW = parseFloat(this.gridCellStyle.getPropertyValue("width"));
+      const winW = window.innerWidth;
+      const numArtworks = this.gridCells.length;
 
-      const numItemsInRow = Math.round(winW / cellW)
+      const numItemsInRow = Math.round(winW / cellW);
 
-      const numRows = numArtworks / numItemsInRow
-      const numHangingItems = (numRows - Math.floor(numRows)) * numItemsInRow
-      let numToAdd = numHangingItems > 0 ? numItemsInRow - numHangingItems : 0
+      const numRows = numArtworks / numItemsInRow;
+      const numHangingItems = (numRows - Math.floor(numRows)) * numItemsInRow;
+      let numToAdd = numHangingItems > 0 ? numItemsInRow - numHangingItems : 0;
 
-      numToAdd = this.removePlaceholdersFromGrid(numToAdd)
-      this.addPlaceholdersToGrid(numToAdd)
+      numToAdd = this.removePlaceholdersFromGrid(numToAdd);
+      this.addPlaceholdersToGrid(numToAdd);
     }
   },
 
-  mounted: function () {
-    window.addEventListener('resize', this.fillEmptySpaceInGrid)
+  mounted: function() {
+    window.addEventListener("resize", this.fillEmptySpaceInGrid);
   }
-}
+};

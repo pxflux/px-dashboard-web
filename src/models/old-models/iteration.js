@@ -23,50 +23,50 @@
  */
 
 import {
-  Contributor,
-  IterationComponent,
   AudioEquipment,
+  Contributor,
   DisplayEquipment,
+  IterationComponent,
   PlaybackEquipment
-} from './iteration-data-types'
-import {getValueFromObj} from '../../helper'
+} from "./iteration-data-types";
+import { getValueFromObj } from "../../helper";
 
 /**
  * @param {object=} data
  * @constructor
  */
-export function IterationModel (data) {
+export function IterationModel(data) {
   this.data = {
-    id: getValueFromObj(data, 'id', ''),
-    name: getValueFromObj(data, 'name', ''),
-    thumbUrl: getValueFromObj(data, 'thumbUrl', ''),
-    date: field('date'),
-    exhibitions: field('Show[]'),
+    id: getValueFromObj(data, "id", ""),
+    name: getValueFromObj(data, "name", ""),
+    thumbUrl: getValueFromObj(data, "thumbUrl", ""),
+    date: field("date"),
+    exhibitions: field("Show[]"),
     /** @type Contributor[] */
     contributors: [],
     /** @type Contributor */
     supervisedBy: new Contributor(),
     installation: fieldsGroup({
-      installedBy: field('text'),
-      withArtist: field('boolean'),
-      artistInfluence: field('Note')
+      installedBy: field("text"),
+      withArtist: field("boolean"),
+      artistInfluence: field("Note")
     }),
     documentation: {
-      images: getValueFromObj(data, 'documentation/images', []),
-      video: getValueFromObj(data, 'documentation/video', []),
-      technicalDrawings: field('url[]'),
-      notes: field('Note[]'),
-      artistInterview: field('Note'),
-      assistantInterview: field('Note'),
-      other: field('url[]')
+      images: getValueFromObj(data, "documentation/images", []),
+      video: getValueFromObj(data, "documentation/video", []),
+      technicalDrawings: field("url[]"),
+      notes: field("Note[]"),
+      artistInterview: field("Note"),
+      assistantInterview: field("Note"),
+      other: field("url[]")
     },
     evaluation: fieldsGroup({
-      notes: field('Note[]'),
+      notes: field("Note[]"),
       approvedByArtist: false,
-      warnings: field('Note[]')
+      warnings: field("Note[]")
     }),
-    comments: field('Comment[]'),
-    publications: field('Publication[]'),
+    comments: field("Comment[]"),
+    publications: field("Publication[]"),
     space: {
       context: new IterationComponent(),
       floorPlan: new IterationComponent(),
@@ -88,14 +88,16 @@ export function IterationModel (data) {
       imagePlacement: new IterationComponent(),
       projectionSurface: new IterationComponent()
     },
-    exhibitionCopies: fieldsGroup({ /* we probably don't need this */ }),
+    exhibitionCopies: fieldsGroup({
+      /* we probably don't need this */
+    }),
     equipment: {
       visual: [new DisplayEquipment()],
       audio: [new AudioEquipment()],
       playback: [new PlaybackEquipment()],
-      other: field('IterationComponentList')
+      other: field("IterationComponentList")
     },
-    otherComponents: field('IterationComponentList'),
+    otherComponents: field("IterationComponentList"),
     technicalSetup: fieldsGroup({
       looped: new IterationComponent(),
       timed: new IterationComponent(),
@@ -107,7 +109,7 @@ export function IterationModel (data) {
       settings: new IterationComponent(),
       other: new IterationComponent()
     })
-  }
+  };
 }
 
 /**
@@ -116,35 +118,35 @@ export function IterationModel (data) {
  *
  * @return {FieldData}
  */
-function field (type, value) {
+function field(type, value) {
   if (!value) {
-    if (!type || type === 'string' || type === 'text') {
-      value = ''
-    } else if (type.substr(-2) === '[]') {
-      value = []
+    if (!type || type === "string" || type === "text") {
+      value = "";
+    } else if (type.substr(-2) === "[]") {
+      value = [];
     } else {
-      value = null
+      value = null;
     }
   }
   return {
-    type: type || 'string',
+    type: type || "string",
     value: value
-  }
+  };
 }
 
 /**
  * @param {Object<string, FieldData>=} fields
  * @return {{name: string, label: string, value: (Object<string, FieldData>), desc: string}}
  */
-function fieldsGroup (fields) {
+function fieldsGroup(fields) {
   return {
-    type: 'fieldsGroup',
+    type: "fieldsGroup",
     value: fields || {}
-  }
+  };
 }
 
-export function cloneIteration (iteration) {
+export function cloneIteration(iteration) {
   return {
     title: iteration.title
-  }
+  };
 }

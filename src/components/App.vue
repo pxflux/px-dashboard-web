@@ -2,17 +2,15 @@
   <div id="app" class="light">
     <site-header/>
     <router-view/>
-    <site-footer/>
   </div>
 </template>
 
 <script>
-  import SiteHeader from '@/components/Header'
-  import SiteFooter from '@/components/Footer'
+import SiteHeader from "@/components/Header";
 
-  export default {
-    components: {SiteHeader, SiteFooter}
-  }
+export default {
+  components: { SiteHeader }
+};
 </script>
 
 <style lang="sass">

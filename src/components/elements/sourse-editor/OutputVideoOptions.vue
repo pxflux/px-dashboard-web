@@ -42,38 +42,38 @@
 </template>
 
 <script>
-  import Vue from 'vue'
-  import VSelect from '../UI/Select/components/Select'
-  import { AWVideoOutput } from '../../../models/AWVideoOutput'
+import Vue from "vue";
+import VSelect from "../UI/Select/components/Select";
+import { AWVideoOutput } from "../../../models/AWVideoOutput";
 
-  export default {
-    name: 'output-video-options',
-    components: {VSelect},
-    props: {bus: Vue, index: Number, value: AWVideoOutput},
+export default {
+  name: "output-video-options",
+  components: { VSelect },
+  props: { bus: Vue, index: Number, value: AWVideoOutput },
 
-    data () {
-      return {
-        options: this.value,
-        types: ['any', 'monitor', 'projection', 'handheld', 'headset']
-      }
+  data() {
+    return {
+      options: this.value,
+      types: ["any", "monitor", "projection", "handheld", "headset"]
+    };
+  },
+
+  methods: {
+    setType(event) {
+      this.options.type = event;
     },
-
-    methods: {
-      setType (event) {
-        this.options.type = event
-      },
-      setValue (prop, event) {
-        prop = event
-      },
-      submit () {
-        this.bus.$emit('updateOutputOptions', this.options, this.index)
-      }
+    setValue(prop, event) {
+      prop = event;
     },
+    submit() {
+      this.bus.$emit("updateOutputOptions", this.options, this.index);
+    }
+  },
 
-    watch: {
-      value (newValue) {
-        this.options = newValue
-      }
+  watch: {
+    value(newValue) {
+      this.options = newValue;
     }
   }
+};
 </script>

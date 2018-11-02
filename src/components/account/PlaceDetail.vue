@@ -13,66 +13,79 @@
 </template>
 
 <script>
-  import { mapState, mapActions } from 'vuex'
-  import { log } from '../../helper'
-  import firebase, { store } from '../../firebase-app'
+import { mapActions, mapState } from "vuex";
+import { log } from "../../helper";
+import { store } from "../../firebase-app";
 
-  export default {
-    created () {
-      this.init()
+export default {
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["userAccount", "accountPlace"]),
+
+    accountId() {
+      if (!this.userAccount) {
+        return null;
+      }
+      return this.userAccount[".key"];
     },
-    computed: {
-      ...mapState(['userAccount', 'accountPlace']),
+    placeId() {
+      return this.$route.params.id;
+    },
+    image() {
+      return this.accountPlace && this.accountPlace.image
+        ? this.accountPlace.image
+        : {
+            displayUrl: null,
+            storageUri: null
+          };
+    }
+  },
+  methods: {
+    ...mapActions(["setRef"]),
 
-      accountId () {
-        if (!this.userAccount) {
-          return null
-        }
-        return this.userAccount['.key']
-      },
-      placeId () {
-        return this.$route.params.id
-      },
-      image () {
-        return this.accountPlace && this.accountPlace.image ? this.accountPlace.image : {
-          displayUrl: null,
-          storageUri: null
-        }
+    init() {
+      if (this.accountId) {
+        this.setRef({
+          key: "accountPlace",
+          ref: this.$firebase
+            .database()
+            .ref("accounts/" + this.accountId + "/places/" + this.placeId)
+        });
       }
     },
-    methods: {
-      ...mapActions(['setRef']),
-
-      init () {
-        if (this.accountId) {
-          this.setRef({
-            key: 'accountPlace',
-            ref: firebase.database().ref('accounts/' + this.accountId + '/places/' + this.placeId)
-          })
-        }
-      },
-      togglePublished (published) {
-        if (!this.accountId) {
-          return
-        }
-        store(this.accountId, this.placeId, 'places', {published: published}).catch(log())
-      },
-      removePlace () {
-        if (!this.accountId) {
-          return
-        }
-        firebase.database().ref('accounts/' + this.accountId + '/places/' + this.placeId).remove().then(function () {
-          this.$router.push('/account/places')
-        }.bind(this)).catch(log)
+    togglePublished(published) {
+      if (!this.accountId) {
+        return;
       }
+      store(this.accountId, this.placeId, "places", {
+        published: published
+      }).catch(log());
     },
-    watch: {
-      $route () {
-        this.init()
-      },
-      'userAccount' () {
-        this.init()
+    removePlace() {
+      if (!this.accountId) {
+        return;
       }
+      this.$firebase
+        .database()
+        .ref("accounts/" + this.accountId + "/places/" + this.placeId)
+        .remove()
+        .then(
+          function() {
+            this.$router.push("/account/places");
+          }.bind(this)
+        )
+        .catch(log);
+    }
+  },
+  watch: {
+    $route() {
+      this.init();
+    },
+    userAccount() {
+      this.init();
     }
   }
+};
 </script>

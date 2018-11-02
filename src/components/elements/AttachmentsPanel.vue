@@ -5,7 +5,7 @@
                     :video-url="video.storage.displayUrl"
                     :ratio="video.ratio"
                     :fill-parent="true"/>
-      <div v-if="images.length" v-for="thumbnail in images" :data-ratio="thumbnail.ratio">
+      <div v-for="(thumbnail, i) in images" :key="i" :data-ratio="thumbnail.ratio">
         <img v-show="thumbnail.displayUrl" :src="thumbnail.displayUrl">
       </div>
       <!--<div v-if="!images.length" class="attachment placeholder"></div>-->
@@ -37,14 +37,12 @@
 </template>
 
 <script>
-  import VideoPlayer from '../VideoPlayer'
-  export default {
-    components: {
-      'video-player': VideoPlayer
-    },
-    props: ['video', 'images']
-  }
-</script>
+import VideoPlayer from "../VideoPlayer";
 
-<style scoped>
-</style>
+export default {
+  components: {
+    "video-player": VideoPlayer
+  },
+  props: ["video", "images"]
+};
+</script>

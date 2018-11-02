@@ -29,51 +29,51 @@
 </template>
 
 <script>
-  import Vue from 'vue'
-  import Popper from 'vue-popperjs'
-  import RemoteButtonOptions from './RemoteButtonOptions'
-  import { Controls } from '../../models/Control'
+import Vue from "vue";
+import Popper from "vue-popperjs";
+import RemoteButtonOptions from "./RemoteButtonOptions";
+import { Controls } from "../../models/Control";
 
-  export default {
-    components: {Popper, RemoteButtonOptions},
-    props: {
-      value: {type: Array, default: () => Controls.empty()}
+export default {
+  components: { Popper, RemoteButtonOptions },
+  props: {
+    value: { type: Array, default: () => Controls.empty() }
+  },
+  mounted() {
+    this.bus.$on("updateButton", (index, options) => {
+      this.closeOptions(index);
+      this.buttons[index] = options;
+      this.submit();
+    });
+  },
+  data() {
+    return {
+      buttons: this.setup(this.value),
+      index: 0,
+      bus: new Vue()
+    };
+  },
+  methods: {
+    setup(value) {
+      const data = new Array(9);
+      value.forEach(control => {
+        if (control.order < data.length) {
+          data[control.order] = control;
+        }
+      });
+      return data;
     },
-    mounted () {
-      this.bus.$on('updateButton', (index, options) => {
-        this.closeOptions(index)
-        this.buttons[index] = options
-        this.submit()
-      })
+    closeOptions(index) {
+      this.$refs.popups[index].doClose();
     },
-    data () {
-      return {
-        buttons: this.setup(this.value),
-        index: 0,
-        bus: new Vue()
-      }
-    },
-    methods: {
-      setup (value) {
-        const data = new Array(9)
-        value.forEach(control => {
-          if (control.order < data.length) {
-            data[control.order] = control
-          }
-        })
-        return data
-      },
-      closeOptions (index) {
-        this.$refs.popups[index].doClose()
-      },
-      submit () {
-        this.$emit('input', this.buttons.slice().filter(_ => _))
-      }
-    },
-    watch: {
-      value: function (value) {
-        this.buttons = this.setup(value)
-      }
+    submit() {
+      this.$emit("input", this.buttons.slice().filter(_ => _));
+    }
+  },
+  watch: {
+    value: function(value) {
+      this.buttons = this.setup(value);
     }
   }
+};
 </script>

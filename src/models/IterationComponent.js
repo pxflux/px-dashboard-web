@@ -1,5 +1,5 @@
-import { BaseComponent } from './BaseComponent'
-import { Contributor } from './Contributor'
+import { BaseComponent } from "./BaseComponent";
+import { Contributor } from "./Contributor";
 
 export class IterationComponent extends BaseComponent {
   /**
@@ -12,20 +12,28 @@ export class IterationComponent extends BaseComponent {
    * @param {Contributor} decidedBy
    * @param {string} status
    */
-  constructor (created, modified, author, text, type, why, decidedBy, status) {
-    super(created, modified, author, text)
-    this.type = type
-    this.why = why
-    this.decidedBy = decidedBy
-    this.status = status
+  constructor(created, modified, author, text, type, why, decidedBy, status) {
+    super(created, modified, author, text);
+    this.type = type;
+    this.why = why;
+    this.decidedBy = decidedBy;
+    this.status = status;
   }
 
-  static fromJson (value) {
-    const parent = BaseComponent.fromJson(value)
+  static fromJson(value) {
+    const parent = BaseComponent.fromJson(value);
     if (parent === null) {
-      return null
+      return null;
     }
-    return new IterationComponent(parent.created, parent.modified, parent.author,
-      parent.text, value.type, value.why, Contributor.fromJson(value.decidedBy), value.status)
+    return new IterationComponent(
+      parent.created,
+      parent.modified,
+      parent.author,
+      parent.text,
+      value.type,
+      value.why,
+      Contributor.fromJson(value.decidedBy),
+      value.status
+    );
   }
 }

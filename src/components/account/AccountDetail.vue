@@ -8,7 +8,7 @@
         <section class="staff">
           <h2>People</h2>
           <ul>
-            <li v-for="person in people" :key="user['.key']" class="card">
+            <li v-for="person in people" :key="person['.key']" class="card">
               <img v-if="person.photoUrl" :src="person.photoUrl" :alt="person.displayName" class="user-photo" width="48"
                    height="48">
               <span>{{ person.displayName }}</span>
@@ -37,91 +37,114 @@
 </template>
 
 <script>
-  import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-  import firebase from '../../firebase-app'
-  import { log } from '../../helper'
-  import EditableString from '../elements/UI/EditableStringWithSubmit'
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
+import { log } from "../../helper";
+import EditableString from "../elements/UI/EditableStringWithSubmit";
 
-  export default {
-    components: {EditableString},
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['user', 'userAccount', 'account']),
-      ...mapGetters(['accountInvitations']),
-      people () {
-        const account = this.account || {}
-        return Object.keys(account.users || {}).map(userId => {
-          const user = account.users[userId]
-          user['.key'] = userId
-          return user
-        })
+export default {
+  components: { EditableString },
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["user", "userAccount", "account"]),
+    ...mapGetters(["accountInvitations"]),
+    people() {
+      const account = this.account || {};
+      return Object.keys(account.users || {}).map(userId => {
+        const user = account.users[userId];
+        user[".key"] = userId;
+        return user;
+      });
+    }
+  },
+  data() {
+    return {
+      title: "",
+      email: "",
+      showEditForm: false,
+      showInviteForm: false
+    };
+  },
+  methods: {
+    ...mapActions(["setRef"]),
+    ...mapMutations(["REMOVE_ACCOUNT"]),
+
+    init() {
+      if (this.userAccount) {
+        this.setRef({
+          key: "account",
+          ref: this.$firebase
+            .database()
+            .ref("accounts/" + this.userAccount[".key"])
+        });
+        this.setRef({
+          key: "invitations",
+          ref: this.$firebase.database().ref("invitations")
+        });
       }
     },
-    data () {
-      return {
-        title: '',
-        email: '',
-        showEditForm: false,
-        showInviteForm: false
-      }
+
+    updateAccount() {
+      this.showEditForm = false;
+      this.$firebase
+        .database()
+        .ref("accounts/" + this.userAccount[".key"] + "/title")
+        .set(this.title)
+        .catch(log);
     },
-    methods: {
-      ...mapActions(['setRef']),
-      ...mapMutations(['REMOVE_ACCOUNT']),
 
-      init () {
-        if (this.userAccount) {
-          this.setRef({key: 'account', ref: firebase.database().ref('accounts/' + this.userAccount['.key'])})
-          this.setRef({key: 'invitations', ref: firebase.database().ref('invitations')})
-        }
-      },
-
-      updateAccount () {
-        this.showEditForm = false
-        firebase.database().ref('accounts/' + this.userAccount['.key'] + '/title').set(this.title).catch(log)
-      },
-
-      invite () {
-        this.showInviteForm = false
-        const invitation = {
-          'account': {
-            'id': this.userAccount['.key'],
-            'title': this.userAccount.title
-          },
-          'email': this.email
-        }
-        firebase.database().ref('invitations').push(invitation).catch(log)
-      },
-
-      removeInvitation (invitationId) {
-        firebase.database().ref('invitations/' + invitationId).remove().catch(log)
-      },
-
-      leaveAccount () {
-        this.showEditForm = false
-        firebase.database().ref('accounts/' + this.userAccount['.key'] + '/users/' + this.user.uid).remove().catch(log)
-      }
+    invite() {
+      this.showInviteForm = false;
+      const invitation = {
+        account: {
+          id: this.userAccount[".key"],
+          title: this.userAccount.title
+        },
+        email: this.email
+      };
+      this.$firebase
+        .database()
+        .ref("invitations")
+        .push(invitation)
+        .catch(log);
     },
-    watch: {
-      $route () {
-        this.init()
-      },
-      'userAccount' () {
-        this.init()
-      },
-      'account' () {
-        this.title = this.account.title
-      }
+
+    removeInvitation(invitationId) {
+      this.$firebase
+        .database()
+        .ref("invitations/" + invitationId)
+        .remove()
+        .catch(log);
+    },
+
+    leaveAccount() {
+      this.showEditForm = false;
+      this.$firebase
+        .database()
+        .ref("accounts/" + this.userAccount[".key"] + "/users/" + this.user.uid)
+        .remove()
+        .catch(log);
+    }
+  },
+  watch: {
+    $route() {
+      this.init();
+    },
+    userAccount() {
+      this.init();
+    },
+    account() {
+      this.title = this.account.title;
     }
   }
+};
 </script>
-<style lang="scss">
 
-  .staff {
-    img {
-      filter: grayscale(100%);
-    }
+<style lang="scss">
+.staff {
+  img {
+    filter: grayscale(100%);
   }
+}
 </style>

@@ -9,7 +9,7 @@
  * @param {number=} zStep
  * @constructor
  */
-function Perlin (xStep, yStep, zStep) {
+function Perlin(xStep, yStep, zStep) {
   // from p5.js
   // http://mrl.nyu.edu/~perlin/noise/
   // Adapting from PApplet.java
@@ -22,43 +22,43 @@ function Perlin (xStep, yStep, zStep) {
   // See: https://github.com/shiffman/The-Nature-of-Code-Examples-p5.js/
   //      blob/master/introduction/Noise1D/noise.js
 
-  'use strict'
+  "use strict";
 
-  const _this = this
-  let xCurOffset = 0
-  let yCurOffset = 0
-  let zCurOffset = 0
+  const _this = this;
+  let xCurOffset = 0;
+  let yCurOffset = 0;
+  let zCurOffset = 0;
   if (!xStep) {
-    xStep = 0.03
+    xStep = 0.03;
   }
   if (!yStep) {
-    yStep = 0.03
+    yStep = 0.03;
   }
   if (!zStep) {
-    zStep = 0
+    zStep = 0;
   }
 
-  const PERLIN_YWRAPB = 4
-  const PERLIN_YWRAP = 1 << PERLIN_YWRAPB
-  const PERLIN_ZWRAPB = 8
-  const PERLIN_ZWRAP = 1 << PERLIN_ZWRAPB
-  const PERLIN_SIZE = 4095
+  const PERLIN_YWRAPB = 4;
+  const PERLIN_YWRAP = 1 << PERLIN_YWRAPB;
+  const PERLIN_ZWRAPB = 8;
+  const PERLIN_ZWRAP = 1 << PERLIN_ZWRAPB;
+  const PERLIN_SIZE = 4095;
 
-  let perlinOctaves = 4 // default to medium smooth
-  let perlinAmpFalloff = 0.5 // 50% reduction/octave
+  let perlinOctaves = 4; // default to medium smooth
+  let perlinAmpFalloff = 0.5; // 50% reduction/octave
 
-  const scaledCosine = function (i) {
-    return 0.5 * (1.0 - Math.cos(i * Math.PI))
-  }
+  const scaledCosine = function(i) {
+    return 0.5 * (1.0 - Math.cos(i * Math.PI));
+  };
 
-  let perlin = null // will be initialized lazily by noise() or noiseSeed()
+  let perlin = null; // will be initialized lazily by noise() or noiseSeed()
 
-  this.getValue = function () {
-    xCurOffset += xStep
-    yCurOffset += yStep
-    zCurOffset += zStep
-    return _this.noise(xCurOffset, yCurOffset, zCurOffset)
-  }
+  this.getValue = function() {
+    xCurOffset += xStep;
+    yCurOffset += yStep;
+    zCurOffset += zStep;
+    return _this.noise(xCurOffset, yCurOffset, zCurOffset);
+  };
 
   /**
    * Returns the Perlin noise value at specified coordinates. Perlin noise is
@@ -99,101 +99,107 @@ function Perlin (xStep, yStep, zStep) {
    * <code>var xoff = 0.0
    *
    * function draw() {
-	 *   background(204)
-	 *   xoff = xoff + .01
-	 *   var n = noise(xoff) * width
-	 *   line(n, 0, n, height)
-	 * }
+   *   background(204)
+   *   xoff = xoff + .01
+   *   var n = noise(xoff) * width
+   *   line(n, 0, n, height)
+   * }
    * </code>
    * </div>
    * <div>
    * <code>var noiseScale=0.02
    *
    * function draw() {
-	 *   background(0)
-	 *   for (let x=0; x < width; x++) {
-	 *     var noiseVal = noise((mouseX+x)*noiseScale, mouseY*noiseScale)
-	 *     stroke(noiseVal*255)
-	 *     line(x, mouseY+noiseVal*80, x, height)
-	 *   }
-	 * }
+   *   background(0)
+   *   for (let x=0; x < width; x++) {
+   *     var noiseVal = noise((mouseX+x)*noiseScale, mouseY*noiseScale)
+   *     stroke(noiseVal*255)
+   *     line(x, mouseY+noiseVal*80, x, height)
+   *   }
+   * }
    * </code>
    * </div>
    */
-  this.noise = function (x, y, z) {
-    y = y || 0
-    z = z || 0
+  this.noise = function(x, y, z) {
+    y = y || 0;
+    z = z || 0;
 
     if (perlin === null) {
-      perlin = new Array(PERLIN_SIZE + 1)
+      perlin = new Array(PERLIN_SIZE + 1);
       for (let i = 0; i < PERLIN_SIZE + 1; i++) {
-        perlin[ i ] = Math.random()
+        perlin[i] = Math.random();
       }
     }
 
-    if (x < 0) { x = -x }
-    if (y < 0) { y = -y }
-    if (z < 0) { z = -z }
+    if (x < 0) {
+      x = -x;
+    }
+    if (y < 0) {
+      y = -y;
+    }
+    if (z < 0) {
+      z = -z;
+    }
 
-    let xi, yi, zi
-    xi = Math.floor(x)
-    yi = Math.floor(y)
-    zi = Math.floor(z)
-    let xf = x - xi
-    let yf = y - yi
-    let zf = z - zi
-    let rxf, ryf
+    let xi, yi, zi;
+    xi = Math.floor(x);
+    yi = Math.floor(y);
+    zi = Math.floor(z);
+    let xf = x - xi;
+    let yf = y - yi;
+    let zf = z - zi;
+    let rxf, ryf;
 
-    let r = 0
-    let ampl = 0.5
+    let r = 0;
+    let ampl = 0.5;
 
-    let n1, n2, n3
+    let n1, n2, n3;
 
     for (let o = 0; o < perlinOctaves; o++) {
-      let of = xi + (yi << PERLIN_YWRAPB) + (zi << PERLIN_ZWRAPB)
+      let of = xi + (yi << PERLIN_YWRAPB) + (zi << PERLIN_ZWRAPB);
 
-      rxf = scaledCosine(xf)
-      ryf = scaledCosine(yf)
+      rxf = scaledCosine(xf);
+      ryf = scaledCosine(yf);
 
-      n1 = perlin[ of & PERLIN_SIZE ]
-      n1 += rxf * (perlin[ (of + 1) & PERLIN_SIZE ] - n1)
-      n2 = perlin[ (of + PERLIN_YWRAP) & PERLIN_SIZE ]
-      n2 += rxf * (perlin[ (of + PERLIN_YWRAP + 1) & PERLIN_SIZE ] - n2)
-      n1 += ryf * (n2 - n1)
+      n1 = perlin[of & PERLIN_SIZE];
+      n1 += rxf * (perlin[(of + 1) & PERLIN_SIZE] - n1);
+      n2 = perlin[(of + PERLIN_YWRAP) & PERLIN_SIZE];
+      n2 += rxf * (perlin[(of + PERLIN_YWRAP + 1) & PERLIN_SIZE] - n2);
+      n1 += ryf * (n2 - n1);
 
-      of += PERLIN_ZWRAP
-      n2 = perlin[ of & PERLIN_SIZE ]
-      n2 += rxf * (perlin[ (of + 1) & PERLIN_SIZE ] - n2)
-      n3 = perlin[ (of + PERLIN_YWRAP) & PERLIN_SIZE ]
-      n3 += rxf * (perlin[ (of + PERLIN_YWRAP + 1) & PERLIN_SIZE ] - n3)
-      n2 += ryf * (n3 - n2)
+      of += PERLIN_ZWRAP;
+      n2 = perlin[of & PERLIN_SIZE];
+      n2 += rxf * (perlin[(of + 1) & PERLIN_SIZE] - n2);
+      n3 = perlin[(of + PERLIN_YWRAP) & PERLIN_SIZE];
+      n3 += rxf * (perlin[(of + PERLIN_YWRAP + 1) & PERLIN_SIZE] - n3);
+      n2 += ryf * (n3 - n2);
 
-      n1 += scaledCosine(zf) * (n2 - n1)
+      n1 += scaledCosine(zf) * (n2 - n1);
 
-      r += n1 * ampl
-      ampl *= perlinAmpFalloff
-      xi <<= 1
-      xf *= 2
-      yi <<= 1
-      yf *= 2
-      zi <<= 1
-      zf *= 2
+      r += n1 * ampl;
+      ampl *= perlinAmpFalloff;
+      xi <<= 1;
+      xf *= 2;
+      yi <<= 1;
+      yf *= 2;
+      zi <<= 1;
+      zf *= 2;
 
       if (xf >= 1.0) {
-        xi++
-        xf--
+        xi++;
+        xf--;
       }
       if (yf >= 1.0) {
-        yi++
-        yf--
+        yi++;
+        yf--;
       }
       if (zf >= 1.0) {
-        zi++
-        zf--
+        zi++;
+        zf--;
       }
     }
-    return r
-  }
+    return r;
+  };
 
   /**
    *
@@ -225,33 +231,37 @@ function Perlin (xStep, yStep, zStep) {
    * var noiseScale=0.02
    *
    * function setup() {
-	 *   createCanvas(100,100)
-	 * }
+   *   createCanvas(100,100)
+   * }
    *
    * function draw() {
-	 *   background(0)
-	 *   for (let y = 0; y < height; y++) {
-	 *     for (let x = 0; x < width/2; x++) {
-	 *       noiseDetail(2,0.2)
-	 *       noiseVal = noise((mouseX+x) * noiseScale,
-	 *                        (mouseY+y) * noiseScale)
-	 *       stroke(noiseVal*255)
-	 *       point(x,y)
-	 *       noiseDetail(8,0.65)
-	 *       noiseVal = noise((mouseX + x + width/2) * noiseScale,
-	 *                        (mouseY + y) * noiseScale)
-	 *       stroke(noiseVal*255)
-	 *       point(x + width/2, y)
-	 *     }
-	 *   }
-	 * }
+   *   background(0)
+   *   for (let y = 0; y < height; y++) {
+   *     for (let x = 0; x < width/2; x++) {
+   *       noiseDetail(2,0.2)
+   *       noiseVal = noise((mouseX+x) * noiseScale,
+   *                        (mouseY+y) * noiseScale)
+   *       stroke(noiseVal*255)
+   *       point(x,y)
+   *       noiseDetail(8,0.65)
+   *       noiseVal = noise((mouseX + x + width/2) * noiseScale,
+   *                        (mouseY + y) * noiseScale)
+   *       stroke(noiseVal*255)
+   *       point(x + width/2, y)
+   *     }
+   *   }
+   * }
    * </code>
    * </div>
    */
-  this.noiseDetail = function (lod, falloff) {
-    if (lod > 0) { perlinOctaves = lod }
-    if (falloff > 0) { perlinAmpFalloff = falloff }
-  }
+  this.noiseDetail = function(lod, falloff) {
+    if (lod > 0) {
+      perlinOctaves = lod;
+    }
+    if (falloff > 0) {
+      perlinAmpFalloff = falloff;
+    }
+  };
 
   /**
    * Sets the seed value for <b>noise()</b>. By default, <b>noise()</b>
@@ -266,56 +276,56 @@ function Perlin (xStep, yStep, zStep) {
    * <code>var xoff = 0.0
    *
    * function setup() {
-	 *   noiseSeed(99)
-	 *   stroke(0, 10)
-	 * }
+   *   noiseSeed(99)
+   *   stroke(0, 10)
+   * }
    *
    * function draw() {
-	 *   xoff = xoff + .01
-	 *   var n = noise(xoff) * width
-	 *   line(n, 0, n, height)
-	 * }
+   *   xoff = xoff + .01
+   *   var n = noise(xoff) * width
+   *   line(n, 0, n, height)
+   * }
    * </code>
    * </div>
    */
-  this.noiseSeed = function (seed) {
+  this.noiseSeed = function(seed) {
     // Linear Congruential Generator
     // Variant of a Lehman Generator
-    const lcg = (function () {
+    const lcg = (function() {
       // Set to values from http://en.wikipedia.org/wiki/Numerical_Recipes
       // m is basically chosen to be large (as it is the max period)
       // and for its relationships to a and c
-      const m = 4294967296
+      const m = 4294967296;
       // a - 1 should be divisible by m's prime factors
-      const a = 1664525
+      const a = 1664525;
       // c and m should be co-prime
-      const c = 1013904223
-      let seed, z
+      const c = 1013904223;
+      let seed, z;
       return {
-        setSeed: function (val) {
+        setSeed: function(val) {
           // pick a random seed if val is undefined or null
           // the >>> 0 casts the seed to an unsigned 32-bit integer
-          z = seed = (val === null ? Math.random() * m : val) >>> 0
+          z = seed = (val === null ? Math.random() * m : val) >>> 0;
         },
-        getSeed: function () {
-          return seed
+        getSeed: function() {
+          return seed;
         },
-        rand: function () {
+        rand: function() {
           // define the recurrence relationship
-          z = (a * z + c) % m
+          z = (a * z + c) % m;
           // return a float in [0, 1)
           // if z = m then z / m = 0 therefore (z % m) / m < 1 always
-          return z / m
+          return z / m;
         }
-      }
-    }())
+      };
+    })();
 
-    lcg.setSeed(seed)
-    perlin = new Array(PERLIN_SIZE + 1)
+    lcg.setSeed(seed);
+    perlin = new Array(PERLIN_SIZE + 1);
     for (let i = 0; i < PERLIN_SIZE + 1; i++) {
-      perlin[ i ] = lcg.rand()
+      perlin[i] = lcg.rand();
     }
-  }
+  };
 }
 
-export default Perlin
+export default Perlin;

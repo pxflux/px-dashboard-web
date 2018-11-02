@@ -15,18 +15,21 @@
 </template>
 
 <script>
-  export default {
-    props: ['artwork', 'uri'],
-    computed: {
-      thumbnail () {
-        if (this.artwork.setups.length && this.artwork.setups[0].thumbnails.length) {
-          return this.artwork.setups[0].thumbnails[0].storage
-        }
-        return null
-      },
-      artists () {
-        return this.artwork.artists.map(artist => artist.fullName).join(', ')
+export default {
+  props: ["artwork", "uri"],
+  computed: {
+    thumbnail() {
+      if (
+        this.artwork.setups.length &&
+        this.artwork.setups[0].thumbnails.length
+      ) {
+        return this.artwork.setups[0].thumbnails[0].storage;
       }
+      return null;
+    },
+    artists() {
+      return this.artwork.artists.map(artist => artist.fullName).join(", ");
     }
   }
+};
 </script>

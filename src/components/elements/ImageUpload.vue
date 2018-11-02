@@ -5,71 +5,72 @@
     <!--<input ref="inputImage" type="file" accept="image/*" @change="uploadImage">-->
     <!--<button v-show="!this.removed && (previewUrl || imageUrl)" @click="removeImage">Remove</button>-->
     <!--<button v-show="this.removed" @click="removed = false">Undo</button>-->
-    <vue2-dropzone :options="dropZoneOptions" :id="'4541353'"/>
+    <dropzone :options="dropZoneOptions" :id="'4541353'"></dropzone>
   </div>
 </template>
 
 <script>
-  import vue2Dropzone from 'vue2-dropzone'
-  import 'vue2-dropzone/dist/vue2Dropzone.css'
-  export default {
-    props: ['imageUrl'],
-    components: {
-      vue2Dropzone
+import vue2Dropzone from "vue2-dropzone";
+import "vue2-dropzone/dist/vue2Dropzone.css";
+
+export default {
+  props: ["imageUrl"],
+  components: {
+    dropzone: vue2Dropzone
+  },
+  computed: {
+    originalUrl: function() {
+      return this.removed ? null : this.imageUrl;
     },
-    computed: {
-      originalUrl: function () {
-        return this.removed ? null : this.imageUrl
-      },
-      showUrl: function () {
-        return this.previewUrl || this.originalUrl
+    showUrl: function() {
+      return this.previewUrl || this.originalUrl;
+    }
+  },
+  data() {
+    return {
+      previewUrl: null,
+      removed: false,
+      dropZoneOptions: {
+        url: "..."
+      }
+    };
+  },
+  methods: {
+    uploadImage(event) {
+      const files = event.target.files || event.dataTransfer.files;
+      if (files && files[0]) {
+        switch (files[0].type) {
+          case "image/jpeg":
+          case "image/jpg":
+          case "image/png":
+          case "image/gif":
+            break;
+          default:
+            return;
+        }
+        const uploadedFile = files[0];
+        this.$emit("input-file", uploadedFile);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          this.previewUrl = e.target.result;
+        }.bind(this);
+        reader.readAsDataURL(uploadedFile);
       }
     },
-    data () {
-      return {
-        previewUrl: null,
-        removed: false,
-        dropZoneOptions: {
-          url: '...'
-        }
+    removeImage() {
+      this.$refs.inputImage.value = "";
+      if (this.previewUrl === null) {
+        this.removed = true;
+        this.$emit("remove-image", true);
+      } else {
+        this.previewUrl = null;
+        this.$emit("input-file", null);
       }
     },
-    methods: {
-      uploadImage (event) {
-        const files = event.target.files || event.dataTransfer.files
-        if (files && files[0]) {
-          switch (files[0].type) {
-            case 'image/jpeg':
-            case 'image/jpg':
-            case 'image/png':
-            case 'image/gif':
-              break
-            default:
-              return
-          }
-          const uploadedFile = files[0]
-          this.$emit('input-file', uploadedFile)
-          const reader = new FileReader()
-          reader.onload = function (e) {
-            this.previewUrl = e.target.result
-          }.bind(this)
-          reader.readAsDataURL(uploadedFile)
-        }
-      },
-      removeImage () {
-        this.$refs.inputImage.value = ''
-        if (this.previewUrl === null) {
-          this.removed = true
-          this.$emit('remove-image', true)
-        } else {
-          this.previewUrl = null
-          this.$emit('input-file', null)
-        }
-      },
-      undo () {
-        this.removed = false
-        this.$emit('remove-image', false)
-      }
+    undo() {
+      this.removed = false;
+      this.$emit("remove-image", false);
     }
   }
+};
 </script>

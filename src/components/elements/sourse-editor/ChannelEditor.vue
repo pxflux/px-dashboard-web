@@ -21,69 +21,74 @@
 </template>
 
 <script>
-  import VueSelect from '../UI/Select/components/Select'
-  import OutputsPanel from './OutputsPanel'
-  import { AWChannel } from '../../../models/AWChannel'
-  import { AWSource } from '../../../models/AWSource'
+import OutputsPanel from "./OutputsPanel";
+import { AWChannel } from "../../../models/AWChannel";
+import { AWSource } from "../../../models/AWSource";
 
-  export default {
-    name: 'channel-editor',
-    props: ['index', 'value'],
-    components: {
-      VueSelect,
-      OutputsPanel
-    },
+export default {
+  name: "channel-editor",
+  props: ["index", "value"],
+  components: {
+    OutputsPanel
+  },
 
-    computed: {
-      url: {
-        set (newValue) {
-          this.sourceUrl = newValue
-          this.setUrl(newValue)
-        },
-        get () {
-          if (this.sourceUrl !== null) {
-            return this.sourceUrl
-          }
-          return this.channel.source ? this.channel.source.url : null
+  computed: {
+    url: {
+      set(newValue) {
+        this.sourceUrl = newValue;
+        this.setUrl(newValue);
+      },
+      get() {
+        if (this.sourceUrl !== null) {
+          return this.sourceUrl;
         }
-      },
-      sourceDescription () {
-        return this.channel.source ? this.channel.source.toString() : 'URL (HTML/Javascript or Vimeo video link)'
+        return this.channel.source ? this.channel.source.url : null;
       }
     },
-    data () {
-      return {
-        channel: this.value || AWChannel.empty(),
-        sourceUrl: null,
-        error: null
-      }
-    },
+    sourceDescription() {
+      return this.channel.source
+        ? this.channel.source.toString()
+        : "URL (HTML/Javascript or Vimeo video link)";
+    }
+  },
+  data() {
+    return {
+      channel: this.value || AWChannel.empty(),
+      sourceUrl: null,
+      error: null
+    };
+  },
 
-    methods: {
-      removeChannel () {
-        this.$emit('remove', this.index)
-      },
-      setUrl (url) {
-        AWSource.fromUrl(url).then(source => {
-          this.channel.source = source
-          this.error = ''
-          this.$emit('input', AWChannel.fromJson(JSON.parse(JSON.stringify(this.channel))))
-        }).catch(err => {
-          this.error = err.message
+  methods: {
+    removeChannel() {
+      this.$emit("remove", this.index);
+    },
+    setUrl(url) {
+      AWSource.fromUrl(url)
+        .then(source => {
+          this.channel.source = source;
+          this.error = "";
+          this.$emit(
+            "input",
+            AWChannel.fromJson(JSON.parse(JSON.stringify(this.channel)))
+          );
         })
-      },
-      setChannel (channel) {
-        this.$emit('input', channel)
-      },
-      fixPanelsOnScroll (e) {
-        this.$refs['outputsPanel'].fixPanelsOnScroll(e)
-      }
+        .catch(err => {
+          this.error = err.message;
+        });
     },
+    setChannel(channel) {
+      this.$emit("input", channel);
+    },
+    fixPanelsOnScroll(e) {
+      this.$refs["outputsPanel"].fixPanelsOnScroll(e);
+    }
+  },
 
-    watch: {
-      value (newValue) {
-        this.channel = newValue || AWChannel.empty()
-      }
+  watch: {
+    value(newValue) {
+      this.channel = newValue || AWChannel.empty();
     }
   }
+};
 </script>

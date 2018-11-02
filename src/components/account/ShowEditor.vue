@@ -9,7 +9,8 @@
       <form id="form-show">
         <fieldset>
           <label>Image</label>
-          <image-upload :imageUrl="image.displayUrl" @input-file="setImageFile" @remove-image="setImageRemoved"></image-upload>
+          <image-upload :imageUrl="image.displayUrl" @input-file="setImageFile"
+                        @remove-image="setImageRemoved"></image-upload>
         </fieldset>
         <fieldset>
           <label>Title</label>
@@ -18,7 +19,7 @@
         <fieldset>
           <label>Places</label>
           <select v-model="selectedPlaceIds" multiple required>
-            <option v-for="place in places" v-bind:value="place['.key']">{{ place.title }}</option>
+            <option v-for="place in places" :key="place['.key']" v-bind:value="place['.key']">{{ place.title }}</option>
           </select>
         </fieldset>
 
@@ -32,97 +33,119 @@
 </template>
 
 <script>
-  import { mapState, mapActions } from 'vuex'
-  import { log } from '../../helper'
-  import firebase, { store } from '../../firebase-app'
-  import ImageUpload from '../elements/ImageUpload'
+import { mapActions, mapState } from "vuex";
+import { log } from "../../helper";
+import { store } from "../../firebase-app";
+import ImageUpload from "../elements/ImageUpload";
 
-  export default {
-    props: ['isNew'],
-    components: {
-      ImageUpload
-    },
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['userAccount', 'accountShow', 'places']),
+export default {
+  props: ["isNew"],
+  components: {
+    ImageUpload
+  },
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["userAccount", "accountShow", "places"]),
 
-      accountId () {
-        if (!this.userAccount) {
-          return null
-        }
-        return this.userAccount['.key']
-      },
-      showId () {
-        return this.$route.params.id
-      },
-      published () {
-        return this.accountShow && this.accountShow.published ? this.accountShow.published : false
-      },
-      image () {
-        return this.accountShow && this.accountShow.image ? this.accountShow.image : {
-          displayUrl: null,
-          storageUri: null
-        }
+    accountId() {
+      if (!this.userAccount) {
+        return null;
       }
+      return this.userAccount[".key"];
     },
-    data () {
-      return {
-        imageFile: null,
-        imageRemoved: false,
-        title: '',
-        selectedPlaceIds: []
-      }
+    showId() {
+      return this.$route.params.id;
     },
-    methods: {
-      ...mapActions(['setRef']),
-
-      init () {
-        if (!this.isNew && this.accountId) {
-          this.setRef({
-            key: 'accountShow',
-            ref: firebase.database().ref('accounts/' + this.accountId + '/shows/' + this.showId)
-          })
-        }
-        this.setRef({key: 'places', ref: firebase.database().ref('places')})
-      },
-
-      setImageFile (file) {
-        this.imageFile = file
-      },
-      setImageRemoved (flag) {
-        this.imageRemoved = flag
-      },
-
-      submitShow () {
-        if (!this.accountId) {
-          return
-        }
-        const show = {
-          published: this.published,
-          title: this.title,
-          places: {}
-        }
-        this.places.filter(place => this.selectedPlaceIds.includes(place['.key'])).forEach(place => {
-          show.places[place['.key']] = {title: place.title}
-        })
-        store(this.accountId, this.showId, 'shows', show, this.imageRemoved, this.imageFile).then(function (ref) {
-          this.$router.push('/account/show/' + ref.key)
-        }.bind(this)).catch(log())
-      }
+    published() {
+      return this.accountShow && this.accountShow.published
+        ? this.accountShow.published
+        : false;
     },
-    watch: {
-      $route () {
-        this.init()
-      },
-      'userAccount' () {
-        this.init()
-      },
-      'accountShow' () {
-        this.title = this.accountShow.title
-        this.selectedPlaceIds = Object.keys(this.accountShow.places || {})
+    image() {
+      return this.accountShow && this.accountShow.image
+        ? this.accountShow.image
+        : {
+            displayUrl: null,
+            storageUri: null
+          };
+    }
+  },
+  data() {
+    return {
+      imageFile: null,
+      imageRemoved: false,
+      title: "",
+      selectedPlaceIds: []
+    };
+  },
+  methods: {
+    ...mapActions(["setRef"]),
+
+    init() {
+      if (!this.isNew && this.accountId) {
+        this.setRef({
+          key: "accountShow",
+          ref: this.$firebase
+            .database()
+            .ref("accounts/" + this.accountId + "/shows/" + this.showId)
+        });
       }
+      this.setRef({
+        key: "places",
+        ref: this.$firebase.database().ref("places")
+      });
+    },
+
+    setImageFile(file) {
+      this.imageFile = file;
+    },
+    setImageRemoved(flag) {
+      this.imageRemoved = flag;
+    },
+
+    submitShow() {
+      if (!this.accountId) {
+        return;
+      }
+      const show = {
+        published: this.published,
+        title: this.title,
+        places: {}
+      };
+      this.places
+        .filter(place => this.selectedPlaceIds.includes(place[".key"]))
+        .forEach(place => {
+          show.places[place[".key"]] = { title: place.title };
+        });
+      store(
+        this.accountId,
+        this.showId,
+        "shows",
+        show,
+        this.imageRemoved,
+        this.imageFile
+      )
+        .then(
+          function(ref) {
+            this.$router.push("/account/show/" + ref.key);
+          }.bind(this)
+        )
+        .catch(log());
+    }
+  },
+  watch: {
+    $route() {
+      this.init();
+    },
+    userAccount() {
+      this.init();
+    },
+    accountShow() {
+      this.title = this.accountShow.title;
+      this.selectedPlaceIds = Object.keys(this.accountShow.places || {});
     }
   }
+};
 </script>

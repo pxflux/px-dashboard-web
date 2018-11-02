@@ -1,4 +1,4 @@
-import { Equipment } from './Equipment'
+import { Equipment } from "./Equipment";
 
 export class AudioEquipment extends Equipment {
   /**
@@ -17,20 +17,60 @@ export class AudioEquipment extends Equipment {
    * @param {string} frequencyResponse
    * @param {number} impedance
    */
-  constructor (created, modified, author, text, type, why, decidedBy, status, dimensions, appearance, weight, sensitivity, frequencyResponse, impedance) {
-    super(created, modified, author, text, type, why, decidedBy, status, dimensions, appearance, weight)
-    this.sensitivity = sensitivity
-    this.frequencyResponse = frequencyResponse
-    this.impedance = impedance
+  constructor(
+    created,
+    modified,
+    author,
+    text,
+    type,
+    why,
+    decidedBy,
+    status,
+    dimensions,
+    appearance,
+    weight,
+    sensitivity,
+    frequencyResponse,
+    impedance
+  ) {
+    super(
+      created,
+      modified,
+      author,
+      text,
+      type,
+      why,
+      decidedBy,
+      status,
+      dimensions,
+      appearance,
+      weight
+    );
+    this.sensitivity = sensitivity;
+    this.frequencyResponse = frequencyResponse;
+    this.impedance = impedance;
   }
 
-  static fromJson (value) {
-    const parent = Equipment.fromJson(value)
+  static fromJson(value) {
+    const parent = Equipment.fromJson(value);
     if (parent === null) {
-      return null
+      return null;
     }
-    return new AudioEquipment(parent.created, parent.modified, parent.author, parent.text, parent.type, parent.why,
-      parent.decidedBy, parent.status, parent.dimensions, parent.appearance, parent.weight, value.sensitivity,
-      value.frequencyResponse, value.impedance)
+    return new AudioEquipment(
+      parent.created,
+      parent.modified,
+      parent.author,
+      parent.text,
+      parent.type,
+      parent.why,
+      parent.decidedBy,
+      parent.status,
+      parent.dimensions,
+      parent.appearance,
+      parent.weight,
+      value.sensitivity,
+      value.frequencyResponse,
+      value.impedance
+    );
   }
 }

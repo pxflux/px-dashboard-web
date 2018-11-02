@@ -1,11 +1,11 @@
-export function log (error) {
+export function log(error) {
   if (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
-export function isNumeric (n) {
-  return !isNaN(parseFloat(n)) && isFinite(n)
+export function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 /**
@@ -14,23 +14,23 @@ export function isNumeric (n) {
  * @param {*=} defaultValue
  * @return {*}
  */
-export function getValueFromObj (parentObj, propPath, defaultValue) {
-  if (typeof parentObj !== 'object') return defaultValue
-  if (!propPath) return defaultValue
+export function getValueFromObj(parentObj, propPath, defaultValue) {
+  if (typeof parentObj !== "object") return defaultValue;
+  if (!propPath) return defaultValue;
 
-  const pathParts = propPath.split('/')
-  const propName = pathParts.shift()
-  if (!parentObj.hasOwnProperty(propName)) return defaultValue
-  const value = parentObj[propName]
+  const pathParts = propPath.split("/");
+  const propName = pathParts.shift();
+  if (!parentObj.hasOwnProperty(propName)) return defaultValue;
+  const value = parentObj[propName];
 
   if (pathParts.length) {
-    if (typeof value === 'object' && !Array.isArray(value)) {
-      return getValueFromObj(pathParts.join('/'), value, defaultValue)
+    if (typeof value === "object" && !Array.isArray(value)) {
+      return getValueFromObj(pathParts.join("/"), value, defaultValue);
     } else {
-      return defaultValue
+      return defaultValue;
     }
   } else {
-    return value
+    return value;
   }
 }
 
@@ -38,7 +38,7 @@ export function getValueFromObj (parentObj, propPath, defaultValue) {
  * @param {Object} theClass
  * @param {Object} parentClass
  */
-export function setupProtoInheritance (theClass, parentClass) {
-  theClass.prototype = Object.create(parentClass.prototype)
-  theClass.prototype.constructor = theClass
+export function setupProtoInheritance(theClass, parentClass) {
+  theClass.prototype = Object.create(parentClass.prototype);
+  theClass.prototype.constructor = theClass;
 }

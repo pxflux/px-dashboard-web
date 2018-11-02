@@ -9,18 +9,18 @@
 </template>
 
 <script>
-  import autoSize from 'autosize'
+import autoSize from "autosize";
 
-  export default {
-    name: 'autosize-textarea',
-    props: ['value', 'placeholder', 'css-class'],
-    mounted () {
-      autoSize(this.$el)
-    },
-    methods: {
-      input (e) {
-        this.$emit('input', e.target.value)
-      }
+export default {
+  name: "autosize-textarea",
+  props: ["value", "placeholder", "css-class"],
+  mounted() {
+    autoSize(this.$el);
+  },
+  methods: {
+    input(e) {
+      this.$emit("input", e.target.value);
     }
   }
+};
 </script>

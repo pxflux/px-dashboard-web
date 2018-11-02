@@ -10,53 +10,54 @@
 </template>
 
 <script>
-  import firebase from '../../firebase-app'
-  import { mapActions, mapState } from 'vuex'
-  import { Artwork } from '../../models/ArtworkData'
-  import ArtworkItem from '../elements/ArtworkItem'
+import { mapActions, mapState } from "vuex";
+import { Artwork } from "../../models/ArtworkData";
+import ArtworkItem from "../elements/ArtworkItem";
 
-  export default {
-    components: {
-      ArtworkItem
-    },
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['userAccount', 'accountArtworks']),
+export default {
+  components: {
+    ArtworkItem
+  },
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["userAccount", "accountArtworks"]),
 
-      accountId () {
-        if (!this.userAccount) {
-          return null
-        }
-        return this.userAccount['.key']
-      },
-      artworks () {
-        if (this.accountArtworks) {
-          return this.accountArtworks.map(it => Artwork.fromJson(it))
-        }
-        return []
+    accountId() {
+      if (!this.userAccount) {
+        return null;
       }
+      return this.userAccount[".key"];
     },
-    methods: {
-      ...mapActions(['setRef']),
-
-      init () {
-        if (this.accountId) {
-          this.setRef({
-            key: 'accountArtworks',
-            ref: firebase.database().ref('accounts/' + this.accountId + '/artworks')
-          })
-        }
+    artworks() {
+      if (this.accountArtworks) {
+        return this.accountArtworks.map(it => Artwork.fromJson(it));
       }
-    },
-    watch: {
-      $route () {
-        this.init()
-      },
-      'userAccount' () {
-        this.init()
+      return [];
+    }
+  },
+  methods: {
+    ...mapActions(["setRef"]),
+
+    init() {
+      if (this.accountId) {
+        this.setRef({
+          key: "accountArtworks",
+          ref: this.$firebase
+            .database()
+            .ref("accounts/" + this.accountId + "/artworks")
+        });
       }
     }
+  },
+  watch: {
+    $route() {
+      this.init();
+    },
+    userAccount() {
+      this.init();
+    }
   }
+};
 </script>

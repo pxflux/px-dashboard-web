@@ -15,68 +15,70 @@
 </template>
 
 <script>
-  import { mapActions, mapState } from 'vuex'
-  import firebase from '../../firebase-app'
-  import vSelect from './UI/Select/components/Select'
-  import inlineSelect from './UI/Select/components/SelectInline'
-  import { ContributorRefs } from '../../models/ContributorRef'
+import { mapActions, mapState } from "vuex";
+import VSelect from "./UI/Select/components/Select";
+import InlineSelect from "./UI/Select/components/SelectInline";
+import { ContributorRefs } from "../../models/ContributorRef";
 
-  export default {
-    props: {
-      value: {type: Array, default: () => ContributorRefs.empty()},
-      withRoles: {type: Boolean, default: false}
-    },
-    components: {
-      vSelect,
-      inlineSelect
-    },
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['artists']),
+export default {
+  props: {
+    value: { type: Array, default: () => ContributorRefs.empty() },
+    withRoles: { type: Boolean, default: false }
+  },
+  components: {
+    VSelect,
+    InlineSelect
+  },
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["artists"]),
 
-      contributors () {
-        return ContributorRefs.fromJson(this.artists)
-      }
-    },
-    data () {
-      return {
-        mutableValue: this.value,
-        roles: [
-          'programming',
-          'editing',
-          'sound',
-          'music',
-          'production',
-          'manager',
-          'assistance'
-        ]
-      }
-    },
-    methods: {
-      ...mapActions(['setRef']),
+    contributors() {
+      return ContributorRefs.fromJson(this.artists);
+    }
+  },
+  data() {
+    return {
+      mutableValue: this.value,
+      roles: [
+        "programming",
+        "editing",
+        "sound",
+        "music",
+        "production",
+        "manager",
+        "assistance"
+      ]
+    };
+  },
+  methods: {
+    ...mapActions(["setRef"]),
 
-      init () {
-        this.setRef({key: 'artists', ref: firebase.database().ref('artists')})
-      },
-      updateValue: function (value) {
-        this.$emit('input', value)
-      },
-      updateRole: function (option, value) {
-        const selected = this.mutableValue.find(item => item.id === option.id)
-        if (selected) {
-          selected.role = value
-        }
-      }
+    init() {
+      this.setRef({
+        key: "artists",
+        ref: this.$firebase.database().ref("artists")
+      });
     },
-    watch: {
-      $route: function () {
-        this.init()
-      },
-      value: function (value) {
-        this.mutableValue = value
+    updateValue: function(value) {
+      this.$emit("input", value);
+    },
+    updateRole: function(option, value) {
+      const selected = this.mutableValue.find(item => item.id === option.id);
+      if (selected) {
+        selected.role = value;
       }
     }
+  },
+  watch: {
+    $route: function() {
+      this.init();
+    },
+    value: function(value) {
+      this.mutableValue = value;
+    }
   }
+};
 </script>

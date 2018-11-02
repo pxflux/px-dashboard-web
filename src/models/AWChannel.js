@@ -1,6 +1,6 @@
-import { AWSource } from './AWSource'
-import { AWVideoOutputs } from './AWVideoOutput'
-import { AWAudioOutputs } from './AWAudioOutput'
+import { AWSource } from "./AWSource";
+import { AWVideoOutputs } from "./AWVideoOutput";
+import { AWAudioOutputs } from "./AWAudioOutput";
 
 /**
  * @property {number} id
@@ -21,52 +21,85 @@ export class AWChannel {
    * @param {boolean} isClockSource
    * @param {number} syncToChannel
    */
-  constructor (id, source, audioOutputs, videoOutputs, sync, isClockSource, syncToChannel) {
-    this.id = isNaN(id) ? 0 : id
-    this.source = source || null
-    this.audioOutputs = audioOutputs
-    this.videoOutputs = videoOutputs
-    this.sync = sync || false
-    this.isClockSource = isClockSource || false
-    this.syncToChannel = isNaN(syncToChannel) ? 0 : syncToChannel
+  constructor(
+    id,
+    source,
+    audioOutputs,
+    videoOutputs,
+    sync,
+    isClockSource,
+    syncToChannel
+  ) {
+    this.id = isNaN(id) ? 0 : id;
+    this.source = source || null;
+    this.audioOutputs = audioOutputs;
+    this.videoOutputs = videoOutputs;
+    this.sync = sync || false;
+    this.isClockSource = isClockSource || false;
+    this.syncToChannel = isNaN(syncToChannel) ? 0 : syncToChannel;
   }
 
-  static empty () {
-    return new AWChannel(0, AWSource.empty(), AWAudioOutputs.empty(), AWVideoOutputs.empty(), false, false, 0)
+  static empty() {
+    return new AWChannel(
+      0,
+      AWSource.empty(),
+      AWAudioOutputs.empty(),
+      AWVideoOutputs.empty(),
+      false,
+      false,
+      0
+    );
   }
 
   /**
    * @param {object} value
    */
-  static fromJson (value) {
-    if (!value || typeof value !== 'object') {
-      return null
+  static fromJson(value) {
+    if (!value || typeof value !== "object") {
+      return null;
     }
-    return new AWChannel(Number.parseInt(value.id), AWSource.fromJson(value.source), AWAudioOutputs.fromJson(value.audioOutputs),
-      AWVideoOutputs.fromJson(value.videoOutputs), value.sync, value.isClockSource, Number.parseInt(value.syncToChannel))
+    return new AWChannel(
+      Number.parseInt(value.id),
+      AWSource.fromJson(value.source),
+      AWAudioOutputs.fromJson(value.audioOutputs),
+      AWVideoOutputs.fromJson(value.videoOutputs),
+      value.sync,
+      value.isClockSource,
+      Number.parseInt(value.syncToChannel)
+    );
   }
 
-  toString () {
-    return AWVideoOutputs.toString(this.videoOutputs) + ' | ' + AWAudioOutputs.toString(this.audioOutputs)
+  toString() {
+    return (
+      AWVideoOutputs.toString(this.videoOutputs) +
+      " | " +
+      AWAudioOutputs.toString(this.audioOutputs)
+    );
   }
 
   /**
    * @param {string} prefix
    * @return {Object}
    */
-  toEntries (prefix) {
-    const data = {}
+  toEntries(prefix) {
+    const data = {};
     if (this.source === null) {
-      data[prefix + 'source'] = null
+      data[prefix + "source"] = null;
     } else {
-      Object.assign(data, this.source.toEntries(prefix + 'source/'))
+      Object.assign(data, this.source.toEntries(prefix + "source/"));
     }
-    Object.assign(data, AWAudioOutputs.toEntries(prefix + 'audioOutputs/', this.audioOutputs))
-    Object.assign(data, AWVideoOutputs.toEntries(prefix + 'videoOutputs/', this.videoOutputs))
-    data[prefix + 'sync'] = this.sync
-    data[prefix + 'isClockSource'] = this.isClockSource
-    data[prefix + 'syncToChannel'] = this.syncToChannel
-    return data
+    Object.assign(
+      data,
+      AWAudioOutputs.toEntries(prefix + "audioOutputs/", this.audioOutputs)
+    );
+    Object.assign(
+      data,
+      AWVideoOutputs.toEntries(prefix + "videoOutputs/", this.videoOutputs)
+    );
+    data[prefix + "sync"] = this.sync;
+    data[prefix + "isClockSource"] = this.isClockSource;
+    data[prefix + "syncToChannel"] = this.syncToChannel;
+    return data;
   }
 
   /**
@@ -74,21 +107,31 @@ export class AWChannel {
    * @param {object} data
    * @param {AWChannel} from
    */
-  updatedEntries (prefix, data, from) {
-    const origin = from || AWChannel.empty()
+  updatedEntries(prefix, data, from) {
+    const origin = from || AWChannel.empty();
     if (this.source !== null) {
-      this.source.updatedEntries(prefix + 'source/', data, origin.source)
+      this.source.updatedEntries(prefix + "source/", data, origin.source);
     }
-    AWAudioOutputs.updatedEntries(prefix + 'audioOutputs/', data, origin.audioOutputs, this.audioOutputs)
-    AWVideoOutputs.updatedEntries(prefix + 'videoOutputs/', data, origin.videoOutputs, this.videoOutputs)
+    AWAudioOutputs.updatedEntries(
+      prefix + "audioOutputs/",
+      data,
+      origin.audioOutputs,
+      this.audioOutputs
+    );
+    AWVideoOutputs.updatedEntries(
+      prefix + "videoOutputs/",
+      data,
+      origin.videoOutputs,
+      this.videoOutputs
+    );
     if (this.sync === origin.sync) {
-      delete data[prefix + 'sync']
+      delete data[prefix + "sync"];
     }
     if (this.isClockSource === origin.isClockSource) {
-      delete data[prefix + 'isClockSource']
+      delete data[prefix + "isClockSource"];
     }
     if (this.syncToChannel === origin.syncToChannel) {
-      delete data[prefix + 'syncToChannel']
+      delete data[prefix + "syncToChannel"];
     }
   }
 }
@@ -97,43 +140,45 @@ export class AWChannels {
   /**
    * @return {AWChannel[]}
    */
-  static empty () {
-    return []
+  static empty() {
+    return [];
   }
 
   /**
    * @param value
    * @return {AWChannel[]}
    */
-  static fromJson (value) {
-    if (!value || typeof value !== 'object') {
-      return []
+  static fromJson(value) {
+    if (!value || typeof value !== "object") {
+      return [];
     }
-    if (typeof value === 'object') {
-      return Object.keys(value).map(key => AWChannel.fromJson(Object.assign(value[key], {id: key})))
+    if (typeof value === "object") {
+      return Object.keys(value).map(key =>
+        AWChannel.fromJson(Object.assign(value[key], { id: key }))
+      );
     }
     if (Array.isArray(value)) {
-      return value.map(it => AWChannel.fromJson(it))
+      return value.map(it => AWChannel.fromJson(it));
     }
-    return []
+    return [];
   }
 
   /**
    * @param {AWChannel[]} values
    */
-  static append (values) {
-    const value = Object.assign(AWChannel.empty(), {id: values.length})
-    values.push(value)
+  static append(values) {
+    const value = Object.assign(AWChannel.empty(), { id: values.length });
+    values.push(value);
   }
 
   /**
    * @param {AWChannel[]} values
    * @param {number} index
    */
-  static remove (values, index) {
-    values.splice(index, 1)
+  static remove(values, index) {
+    values.splice(index, 1);
     for (let i = 0; i < values.length; i++) {
-      values[i].id = i
+      values[i].id = i;
     }
   }
 
@@ -142,12 +187,12 @@ export class AWChannels {
    * @param {AWChannel[]} values
    * @return {Object}
    */
-  static toEntries (prefix, values) {
-    const data = {}
+  static toEntries(prefix, values) {
+    const data = {};
     values.forEach(value => {
-      Object.assign(data, value.toEntries(prefix + value.id + '/'))
-    })
-    return data
+      Object.assign(data, value.toEntries(prefix + value.id + "/"));
+    });
+    return data;
   }
 
   /**
@@ -156,18 +201,18 @@ export class AWChannels {
    * @param {AWChannel[]} originals
    * @param {AWChannel[]} values
    */
-  static updatedEntries (prefix, data, originals, values) {
+  static updatedEntries(prefix, data, originals, values) {
     // add & updates
     values.forEach(value => {
-      const original = originals.find(item => item.id === value.id)
-      value.updatedEntries(prefix + value.id + '/', data, original)
-    })
+      const original = originals.find(item => item.id === value.id);
+      value.updatedEntries(prefix + value.id + "/", data, original);
+    });
     // remove
     originals.forEach(original => {
-      const items = values.filter(item => item.id === original.id)
+      const items = values.filter(item => item.id === original.id);
       if (items.length === 0) {
-        data[prefix + original.id] = null
+        data[prefix + original.id] = null;
       }
-    })
+    });
   }
 }

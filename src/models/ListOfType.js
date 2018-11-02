@@ -9,12 +9,12 @@ export class ListOfType {
    * @param {constructor} constructor
    * @param {object=} jsonData
    */
-  constructor (constructor, jsonData) {
-    this.DataType = constructor
-    this.list = []
+  constructor(constructor, jsonData) {
+    this.DataType = constructor;
+    this.list = [];
 
-    if (typeof jsonData === 'object') {
-      this.fromJson(jsonData)
+    if (typeof jsonData === "object") {
+      this.fromJson(jsonData);
     }
   }
 
@@ -22,24 +22,24 @@ export class ListOfType {
    * @param {ListOfType} originalSet
    * @return {array}
    */
-  updatedEntries (originalSet) {
-    const updatedList = []
+  updatedEntries(originalSet) {
+    const updatedList = [];
     this.list.forEach((obj, i) => {
       if (originalSet.list.length > i) {
-        const objUpdatedEntries = obj.updatedEntries(originalSet[i])
+        const objUpdatedEntries = obj.updatedEntries(originalSet[i]);
         if (Object.keys(objUpdatedEntries).length) {
-          updatedList.push(objUpdatedEntries)
+          updatedList.push(objUpdatedEntries);
         }
       } else {
-        updatedList.push(obj)
+        updatedList.push(obj);
       }
-    })
-    return updatedList
+    });
+    return updatedList;
   }
 
-  fromJson (value) {
-    if (typeof value === 'object') {
-      this.list = Object.keys(value).map(key => new this.DataType(value[key]))
+  fromJson(value) {
+    if (typeof value === "object") {
+      this.list = Object.keys(value).map(key => new this.DataType(value[key]));
     }
   }
 }

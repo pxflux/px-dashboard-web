@@ -16,48 +16,55 @@
 </template>
 
 <script>
-  import { mapActions, mapGetters, mapState } from 'vuex'
-  import { log } from '../../helper'
-  import firebase from '../../firebase-app'
+import { mapActions, mapGetters, mapState } from "vuex";
+import { log } from "../../helper";
 
-  export default {
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['user']),
-      ...mapGetters(['userInvitations'])
-    },
-    methods: {
-      ...mapActions(['setRef']),
+export default {
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["user"]),
+    ...mapGetters(["userInvitations"])
+  },
+  methods: {
+    ...mapActions(["setRef"]),
 
-      init () {
-        if (this.user) {
-          this.setRef({
-            key: 'invitations',
-            ref: firebase.database().ref('invitations')
-          })
-        }
-      },
-      acceptInvitation (invitationId) {
-        const data = {
-          'uid': this.user.uid,
-          'displayName': this.user.displayName,
-          'photoUrl': this.user.photoURL
-        }
-        firebase.database().ref('invitations/' + invitationId + '/user').set(data).catch(log)
-      },
-      rejectInvitation (invitationId) {
-        firebase.database().ref('invitations/' + invitationId).remove().catch(log)
+    init() {
+      if (this.user) {
+        this.setRef({
+          key: "invitations",
+          ref: this.$firebase.database().ref("invitations")
+        });
       }
     },
-    watch: {
-      $route () {
-        this.init()
-      },
-      'user' () {
-        this.init()
-      }
+    acceptInvitation(invitationId) {
+      const data = {
+        uid: this.user.uid,
+        displayName: this.user.displayName,
+        photoUrl: this.user.photoURL
+      };
+      this.$firebase
+        .database()
+        .ref("invitations/" + invitationId + "/user")
+        .set(data)
+        .catch(log);
+    },
+    rejectInvitation(invitationId) {
+      this.$firebase
+        .database()
+        .ref("invitations/" + invitationId)
+        .remove()
+        .catch(log);
+    }
+  },
+  watch: {
+    $route() {
+      this.init();
+    },
+    user() {
+      this.init();
     }
   }
+};
 </script>

@@ -4,8 +4,8 @@
       <canvas id="px-main-logo"></canvas>
     </div>
     <div class="subtitle" ref="subtitleBox">
-      <div v-for="w in pxSubtitlesWords" class="word">
-        <span v-for="l in w" ref="subtitleLetters">{{l}}</span>
+      <div v-for="(w, i) in pxSubtitlesWords" :key="i" class="word">
+        <span v-for="(l, i) in w" :key="i" ref="subtitleLetters">{{l}}</span>
       </div>
     </div>
     <h1 style="margin-top: 377px; padding: 0 4rem;">
@@ -90,7 +90,7 @@
             product during shows.
           </p>
           <p>
-            
+
             Learn about and experience
             Learn artists and their artworks, follow….
             Accessible,without hassle of technical…. ,
@@ -99,7 +99,7 @@
             in a public space, a gallery or in a living room.
           </p>
           <p>
-            
+
             Display ( player)
           </p>
           <p>
@@ -112,7 +112,7 @@
             delegated to the pxRemote app.
           </p>
           <p>
-            
+
             Remote
           </p>
           <p>
@@ -244,6 +244,7 @@
     }
   }
 </script>
+
 <style lang="scss">
   @import "../../assets/sass/vars";
   @import "../../assets/sass/mixins";

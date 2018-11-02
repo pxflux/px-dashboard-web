@@ -22,85 +22,93 @@
 </template>
 
 <script>
-  import { VideoAttachment } from '../../models/VideoAttachment'
-  import VideoPlayer from '../VideoPlayer'
-  import AutosizeTextarea from './UI/AutosizeTextarea'
+import { VideoAttachment } from "../../models/VideoAttachment";
+import VideoPlayer from "../VideoPlayer";
+import AutosizeTextarea from "./UI/AutosizeTextarea";
 
-  export default {
-    components: { VideoPlayer, AutosizeTextarea },
-    props: {
-      value: VideoAttachment
-    },
-    computed: {
-      url: {
-        set (newValue) {
-          this.videoUrl = newValue
-          this.setUrl(newValue)
-        },
-        get () {
-          if (this.videoUrl !== null) {
-            return this.videoUrl
-          }
-          return this.video.storage ? this.video.storage.displayUrl : null
+export default {
+  components: { VideoPlayer, AutosizeTextarea },
+  props: {
+    value: VideoAttachment
+  },
+  computed: {
+    url: {
+      set(newValue) {
+        this.videoUrl = newValue;
+        this.setUrl(newValue);
+      },
+      get() {
+        if (this.videoUrl !== null) {
+          return this.videoUrl;
         }
+        return this.video.storage ? this.video.storage.displayUrl : null;
+      }
+    },
+    caption: {
+      set(newValue) {
+        this.videoCaption = newValue;
+        this.setCaption(newValue);
       },
-      caption: {
-        set (newValue) {
-          this.videoCaption = newValue
-          this.setCaption(newValue)
-        },
-        get () {
-          if (this.videoCaption !== null) {
-            return this.videoCaption
-          }
-          return this.video.caption
+      get() {
+        if (this.videoCaption !== null) {
+          return this.videoCaption;
         }
-      },
-      displayUrl () {
-        return this.video.storage ? this.video.storage.displayUrl : null
-      },
-      ratio () {
-        return this.video ? this.video.ratio : 1
+        return this.video.caption;
       }
     },
-
-    data () {
-      return {
-        video: this.value || VideoAttachment.empty(),
-        videoUrl: null,
-        videoCaption: null,
-        error: null
-      }
+    displayUrl() {
+      return this.video.storage ? this.video.storage.displayUrl : null;
     },
-
-    methods: {
-      setUrl (url) {
-        VideoAttachment.fromUrl(url).then(video => {
-          if (video) {
-            this.error = null
-            this.$emit('input', VideoAttachment.fromJson(JSON.parse(JSON.stringify(video))))
-          } else {
-            this.error = 'It doesn\'t look like a correct Vimeo url.'
-          }
-        }).catch(error => {
-          this.error = error ? error.message : null
-        })
-      },
-
-      setCaption (caption) {
-        this.video.caption = caption
-        this.$emit('input', VideoAttachment.fromJson(JSON.parse(JSON.stringify(this.video))))
-      }
-    },
-
-    watch: {
-      value (newValue) {
-        this.video = newValue || VideoAttachment.empty()
-      }
-    },
-
-    mounted () {
-      // window.addEventListener('resize')
+    ratio() {
+      return this.video ? this.video.ratio : 1;
     }
+  },
+
+  data() {
+    return {
+      video: this.value || VideoAttachment.empty(),
+      videoUrl: null,
+      videoCaption: null,
+      error: null
+    };
+  },
+
+  methods: {
+    setUrl(url) {
+      VideoAttachment.fromUrl(url)
+        .then(video => {
+          if (video) {
+            this.error = null;
+            this.$emit(
+              "input",
+              VideoAttachment.fromJson(JSON.parse(JSON.stringify(video)))
+            );
+          } else {
+            this.error = "It doesn't look like a correct Vimeo url.";
+          }
+        })
+        .catch(error => {
+          this.error = error ? error.message : null;
+        });
+    },
+
+    setCaption(caption) {
+      this.video.caption = caption;
+      this.$emit(
+        "input",
+        VideoAttachment.fromJson(JSON.parse(JSON.stringify(this.video)))
+      );
+    }
+  },
+
+  watch: {
+    value(newValue) {
+      this.video = newValue || VideoAttachment.empty();
+    }
+  },
+
+  mounted() {
+    // window.addEventListener('resize')
   }
+};
 </script>

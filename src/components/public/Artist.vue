@@ -23,44 +23,43 @@
 </template>
 
 <script>
-  import { mapActions, mapState } from 'vuex'
-  import firebase from '../../firebase-app'
+import { mapActions, mapState } from "vuex";
 
-  export default {
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['artist']),
+export default {
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["artist"]),
 
-      artistId () {
-        return this.$route.params.id
-      },
-      artworks () {
-        return Object.keys(this.artist.artworks || {}).map(id => {
-          return {...this.artist.artworks[id], ...{'.key': id}}
-        })
-      },
-      shows () {
-        return Object.keys(this.artist.shows || {}).map(id => {
-          return {...this.artist.shows[id], ...{'.key': id}}
-        })
-      }
+    artistId() {
+      return this.$route.params.id;
     },
-    methods: {
-      ...mapActions(['setRef']),
+    artworks() {
+      return Object.keys(this.artist.artworks || {}).map(id => {
+        return { ...this.artist.artworks[id], ...{ ".key": id } };
+      });
+    },
+    shows() {
+      return Object.keys(this.artist.shows || {}).map(id => {
+        return { ...this.artist.shows[id], ...{ ".key": id } };
+      });
+    }
+  },
+  methods: {
+    ...mapActions(["setRef"]),
 
-      init () {
-        this.setRef({
-          key: 'artist',
-          ref: firebase.database().ref('artists/' + this.artistId)
-        })
-      }
-    },
-    watch: {
-      $route () {
-        this.init()
-      }
+    init() {
+      this.setRef({
+        key: "artist",
+        ref: this.$firebase.database().ref("artists/" + this.artistId)
+      });
+    }
+  },
+  watch: {
+    $route() {
+      this.init();
     }
   }
+};
 </script>

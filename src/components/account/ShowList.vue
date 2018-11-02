@@ -17,39 +17,43 @@
 </template>
 
 <script>
-  import { mapActions, mapState } from 'vuex'
-  import firebase from '../../firebase-app'
+import { mapActions, mapState } from "vuex";
 
-  export default {
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['userAccount', 'accountShows']),
+export default {
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["userAccount", "accountShows"]),
 
-      accountId () {
-        if (!this.userAccount) {
-          return null
-        }
-        return this.userAccount['.key']
+    accountId() {
+      if (!this.userAccount) {
+        return null;
       }
-    },
-    methods: {
-      ...mapActions(['setRef']),
+      return this.userAccount[".key"];
+    }
+  },
+  methods: {
+    ...mapActions(["setRef"]),
 
-      init () {
-        if (this.accountId) {
-          this.setRef({key: 'accountShows', ref: firebase.database().ref('accounts/' + this.accountId + '/shows')})
-        }
-      }
-    },
-    watch: {
-      $route () {
-        this.init()
-      },
-      'userAccount' () {
-        this.init()
+    init() {
+      if (this.accountId) {
+        this.setRef({
+          key: "accountShows",
+          ref: this.$firebase
+            .database()
+            .ref("accounts/" + this.accountId + "/shows")
+        });
       }
     }
+  },
+  watch: {
+    $route() {
+      this.init();
+    },
+    userAccount() {
+      this.init();
+    }
   }
+};
 </script>

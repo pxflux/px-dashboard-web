@@ -9,35 +9,35 @@ export class AttachmentStorage {
    * @param {?string=} storageUrl
    * @param {?File=} file
    */
-  constructor (displayUrl, storageUrl, file) {
-    this.displayUrl = displayUrl || null
-    this.storageUrl = storageUrl || null
-    this.file = file || null
+  constructor(displayUrl, storageUrl, file) {
+    this.displayUrl = displayUrl || null;
+    this.storageUrl = storageUrl || null;
+    this.file = file || null;
   }
 
-  static empty () {
-    return new AttachmentStorage(null, null, null)
+  static empty() {
+    return new AttachmentStorage(null, null, null);
   }
 
   /**
    * @return {?AttachmentStorage}
    */
-  static fromJson (value) {
-    if (!value || typeof value !== 'object') {
-      return null
+  static fromJson(value) {
+    if (!value || typeof value !== "object") {
+      return null;
     }
-    return new AttachmentStorage(value.displayUrl, value.storageUrl, null)
+    return new AttachmentStorage(value.displayUrl, value.storageUrl, null);
   }
 
   /**
    * @param {string} prefix - '.../setups/{index}/thumbnails/{index}/storage/'
    * @return {Object}
    */
-  toEntries (prefix) {
-    const data = {}
-    data[prefix + 'displayUrl'] = this.displayUrl
-    data[prefix + 'storageUrl'] = this.storageUrl
-    return data
+  toEntries(prefix) {
+    const data = {};
+    data[prefix + "displayUrl"] = this.displayUrl;
+    data[prefix + "storageUrl"] = this.storageUrl;
+    return data;
   }
 
   /**
@@ -45,13 +45,13 @@ export class AttachmentStorage {
    * @param {Object} data
    * @param {AttachmentStorage} from
    */
-  updatedEntries (prefix, data, from) {
-    const origin = from || AttachmentStorage.empty()
+  updatedEntries(prefix, data, from) {
+    const origin = from || AttachmentStorage.empty();
     if (this.displayUrl === origin.displayUrl) {
-      delete data[prefix + 'displayUrl']
+      delete data[prefix + "displayUrl"];
     }
     if (this.storageUrl === origin.storageUrl) {
-      delete data[prefix + 'storageUrl']
+      delete data[prefix + "storageUrl"];
     }
   }
 }

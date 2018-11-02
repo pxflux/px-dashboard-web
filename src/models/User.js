@@ -1,4 +1,4 @@
-import { Attachment } from './Attachment'
+import { Attachment } from "./Attachment";
 
 /**
  * @property {string} id
@@ -13,17 +13,22 @@ export class User {
    * @param {string} photoUrl
    * @param {Attachment} photo
    */
-  constructor (id, displayName, photoUrl, photo) {
-    this.id = id
-    this.displayName = displayName
-    this.photoUrl = photoUrl
-    this.photo = photo
+  constructor(id, displayName, photoUrl, photo) {
+    this.id = id;
+    this.displayName = displayName;
+    this.photoUrl = photoUrl;
+    this.photo = photo;
   }
 
-  static fromJson (value) {
-    if (typeof value !== 'object') {
-      return null
+  static fromJson(value) {
+    if (typeof value !== "object") {
+      return null;
     }
-    return new User(value.id, value.displayName, value.photoUrl, Attachment.fromJson(value.photo))
+    return new User(
+      value.id,
+      value.displayName,
+      value.photoUrl,
+      Attachment.fromJson(value.photo)
+    );
   }
 }

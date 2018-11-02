@@ -10,67 +10,74 @@
 </template>
 
 <script>
-  import { mapState, mapActions } from 'vuex'
-  import firebase from '../../firebase-app'
-  import { log } from '../../helper'
+import { mapActions, mapState } from "vuex";
+import { log } from "../../helper";
 
-  export default {
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['user', 'accountIteration'])
-    },
-    data () {
-      return {
-        title: {
-          val: '',
-          edit: false
-        }
+export default {
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["user", "accountIteration"])
+  },
+  data() {
+    return {
+      title: {
+        val: "",
+        edit: false
+      }
+    };
+  },
+  methods: {
+    ...mapActions(["setRef"]),
+
+    init() {
+      if (this.user.uid) {
+        this.source = this.$firebase
+          .database()
+          .ref(
+            "users/" +
+              this.user.uid +
+              "/artworks/" +
+              this.$route.params.artworkId +
+              "/iterations/" +
+              this.$route.params.id
+          );
+        this.setRef({ key: "accountIteration", ref: this.source });
+      } else {
+        this.source = null;
       }
     },
-    methods: {
-      ...mapActions(['setRef']),
 
-      init () {
-        if (this.user.uid) {
-          this.source = firebase.database().ref('users/' + this.user.uid + '/artworks/' + this.$route.params.artworkId + '/iterations/' + this.$route.params.id)
-          this.setRef({key: 'accountIteration', ref: this.source})
-        } else {
-          this.source = null
-        }
-      },
-
-      toggleTitle: function () {
-        this.$set(this.title, 'edit', !this.title.edit)
-        // Focus input field
-        if (this.title.edit) {
-          this.$nextTick(function () {
-            this.$refs.inputTitle.focus()
-          })
-        }
-      },
-
-      saveTitle: function () {
-        this.toggleTitle()
-        if (this.source) {
-          this.source.update({'title': this.title.val}, log)
-        }
-      },
-
-      publishIteration () {
+    toggleTitle: function() {
+      this.$set(this.title, "edit", !this.title.edit);
+      // Focus input field
+      if (this.title.edit) {
+        this.$nextTick(function() {
+          this.$refs.inputTitle.focus();
+        });
       }
     },
-    watch: {
-      $route () {
-        this.init()
-      },
-      'user' () {
-        this.init()
-      },
-      'accountIteration' () {
-        this.title.val = this.accountIteration.title || 'Untitled'
+
+    saveTitle: function() {
+      this.toggleTitle();
+      if (this.source) {
+        this.source.update({ title: this.title.val }, log);
       }
+    },
+
+    publishIteration() {}
+  },
+  watch: {
+    $route() {
+      this.init();
+    },
+    user() {
+      this.init();
+    },
+    accountIteration() {
+      this.title.val = this.accountIteration.title || "Untitled";
     }
   }
+};
 </script>

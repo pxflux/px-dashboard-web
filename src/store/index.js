@@ -1,65 +1,68 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import actions from './actions'
-import mutations from './mutations'
-import getters from './getters'
+import Vue from "vue";
+import Vuex from "vuex";
+import actions from "./actions";
+import mutations from "./mutations";
+import getters from "./getters";
 
 const firebaseProgress = store => {
-  store.subscribe((mutation, state) => {
-    if (mutation.type === 'vuexfire/OBJECT_VALUE' || mutation.type === 'VUEXFIRE_ARRAY_INITIALIZE') {
-      store.commit('SET_LOADING', false)
+  store.subscribe(mutation => {
+    if (
+      mutation.type === "vuexfire/OBJECT_VALUE" ||
+      mutation.type === "VUEXFIRE_ARRAY_INITIALIZE"
+    ) {
+      store.commit("SET_LOADING", false);
     }
-  })
-}
+  });
+};
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
-export function createStore () {
-  return new Vuex.Store({
-    plugins: [firebaseProgress],
-    state: {
-      loading: false,
+export default new Vuex.Store({
+  plugins: [firebaseProgress],
+  state: {
+    loading: false,
 
-      config: null,
+    config: null,
 
-      user: null,
-      userAccount: null,
+    user: null,
+    userAccount: null,
 
-      playerPin: null,
+    playerPin: null,
 
-      artworks: [],
-      publicArtwork: null,
-      artists: [],
-      artist: null,
-      shows: [],
-      show: null,
-      places: [],
-      place: null,
-      collector: null,
-      curator: null,
-      publication: null,
+    artworks: [],
+    publicArtwork: null,
+    artists: [],
+    artist: null,
+    shows: [],
+    show: null,
+    places: [],
+    place: null,
+    collector: null,
+    curator: null,
+    publication: null,
 
-      accounts: [],
-      account: null,
-      invitations: [],
+    accounts: [],
+    account: null,
+    invitations: [],
 
-      accountPlayers: [],
+    accountPlayers: [],
 
-      accountArtworks: [],
-      accountArtwork: null,
+    accountArtworks: [],
+    accountArtwork: null,
 
-      accountArtists: [],
-      accountArtist: null,
-      accountShows: [],
-      accountShow: null,
-      accountPlaces: [],
-      accountPlace: null,
-      accountIteration: null,
+    accountArtists: [],
+    accountArtist: null,
+    accountShows: [],
+    accountShow: null,
+    accountPlaces: [],
+    accountPlace: null,
+    accountIteration: null,
 
-      items: {/* [id: string]: {} */}
-    },
-    actions,
-    mutations,
-    getters
-  })
-}
+    items: {
+      /* [id: string]: {} */
+    }
+  },
+  actions,
+  mutations,
+  getters
+});

@@ -68,28 +68,24 @@
 </template>
 
 <script>
-  import vSelect from './Select'
+import vSelect from "./Select";
 
-  export default {
-    extends: vSelect,
-    name: 'select-inline',
-    computed: {
-      valueAsArray () {
-        if (this.multiple) {
-          return this.mutableValue
-        } else if (this.mutableValue) {
-          return [this.mutableValue]
-        }
-        return ['select a role']
-      },
-      placeholderValue () {
-        return this.mutableValue ? this.mutableValue : ''
-      }/* ,
+export default {
+  extends: vSelect,
+  name: "select-inline",
+  computed: {
+    valueAsArray() {
+      if (this.multiple) {
+        return this.mutableValue;
+      } else if (this.mutableValue) {
+        return [this.mutableValue];
+      }
+      return ["select a role"];
+    },
+    placeholderValue() {
+      return this.mutableValue ? this.mutableValue : "";
+    } /* ,
       dropdownOpen () { return true }/**/
-    }
   }
+};
 </script>
-
-<style scoped>
-
-</style>

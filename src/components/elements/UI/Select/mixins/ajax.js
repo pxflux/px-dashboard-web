@@ -1,5 +1,4 @@
-/* eslint-disable no-return-assign */
-module.exports = {
+export default {
   props: {
     /**
      * Toggles the adding of a 'loading' class to the main
@@ -24,14 +23,14 @@ module.exports = {
      */
     onSearch: {
       type: Function,
-      default: function (search, loading) {}
+      default: function() {}
     }
   },
 
-  data () {
+  data() {
     return {
       mutableLoading: false
-    }
+    };
   },
 
   watch: {
@@ -39,10 +38,10 @@ module.exports = {
      * If a callback & search text has been provided,
      * invoke the onSearch callback.
      */
-    search () {
+    search() {
       if (this.search.length > 0) {
-        this.onSearch(this.search, this.toggleLoading)
-        this.$emit('search', this.search, this.toggleLoading)
+        this.onSearch(this.search, this.toggleLoading);
+        this.$emit("search", this.search, this.toggleLoading);
       }
     },
     /**
@@ -50,8 +49,8 @@ module.exports = {
      * mutable loading value.
      * @param val
      */
-    loading (val) {
-      this.mutableLoading = val
+    loading(val) {
+      this.mutableLoading = val;
     }
   },
 
@@ -63,11 +62,11 @@ module.exports = {
      * @param toggle Boolean
      * @returns {*}
      */
-    toggleLoading (toggle = null) {
+    toggleLoading(toggle = null) {
       if (toggle == null) {
-        return this.mutableLoading = !this.mutableLoading
+        return (this.mutableLoading = !this.mutableLoading);
       }
-      return this.mutableLoading = toggle
+      return (this.mutableLoading = toggle);
     }
   }
-}
+};

@@ -90,10 +90,10 @@ body {
   overflow-y: scroll;
   overflow-x: hidden;
   color: $font-color;
-  background: $dark-bg url('/static/img/grid-cell-3px-o10@1x.png') repeat 0 0;
+  background: $dark-bg url('/img/grid-cell-3px-o10@1x.png') repeat 0 0;
   background-size: 3px;
   @include on-retina {
-    background: $dark-bg url('/static/img/grid-cell-3px-o10@2x.png') repeat 0 0;
+    background: $dark-bg url('/img/grid-cell-3px-o10@2x.png') repeat 0 0;
     background-size: 3px;
   }
 

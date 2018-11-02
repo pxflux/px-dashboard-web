@@ -5,20 +5,18 @@
   "author": "PxFlux Team",
   "private": true,
   "scripts": {
-    "dev": "node build/dev-server.js",
-    "start": "npm run dev",
-    "build": "node build/build.js",
-    "lint": "eslint --ext .js,.vue src"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "@vimeo/player": "^2.6.1",
     "autosize": "^4.0.2",
-    "axios": "^0.17.1",
-    "axios-add-jsonp": "0.0.4",
+    "axios": "^0.18.0",
+    "axios-add-jsonp": "0.1.0",
     "axios-jsonp-pro": "^1.0.1",
     "element-ui": "^2.2.0",
-    "firebase": "^4.9.1",
-    "firebaseui": "^2.6.0",
+    "firebase": "^5.5.6",
     "jsonp": "^0.2.1",
     "keycode": "^2.1.9",
     "latinize": "^0.4.0",
@@ -32,7 +30,7 @@
     "vue-router": "^3.0.1",
     "vue-scrollto": "^2.11.0",
     "vue-select": "^2.4.0",
-    "vue-vimeo-player": "0.0.6",
+    "vue-vimeo-player": "0.0.9",
     "vue2-dropzone": "^3.0.6",
     "vue2-medium-editor": "^1.1.2",
     "vuex": "^3.0.1",
@@ -41,63 +39,32 @@
     "weakmap": "0.0.6"
   },
   "devDependencies": {
-    "autoprefixer": "^7.2.6",
-    "babel-core": "^6.22.1",
-    "babel-eslint": "^7.1.1",
-    "babel-loader": "^7.1.1",
-    "babel-plugin-transform-runtime": "^6.22.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-stage-2": "^6.22.0",
-    "babel-register": "^6.22.0",
-    "chalk": "^2.3.1",
-    "connect-history-api-fallback": "^1.5.0",
-    "copy-webpack-plugin": "^4.4.1",
-    "css-loader": "^0.28.9",
-    "eslint": "^3.19.0",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-friendly-formatter": "^3.0.0",
-    "eslint-import-resolver-webpack": "^0.8.4",
-    "eslint-loader": "^1.7.1",
-    "eslint-plugin-html": "^3.0.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-node": "^5.2.1",
-    "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "eventsource-polyfill": "^0.9.6",
-    "express": "^4.14.1",
-    "extract-text-webpack-plugin": "^3.0.2",
-    "file-loader": "^1.1.6",
-    "friendly-errors-webpack-plugin": "^1.6.1",
-    "html-webpack-plugin": "^2.30.1",
-    "http-proxy-middleware": "^0.17.3",
-    "lost": "^8.2.0",
+    "@vue/cli": "^3.1.0",
+    "@vue/cli-plugin-babel": "^3.1.0",
+    "@vue/cli-plugin-eslint": "^3.1.0",
+    "@vue/cli-service": "^3.1.0",
+    "@vue/eslint-config-prettier": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.8.0",
+    "eslint-plugin-vue": "^5.0.0-0",
+    "lint-staged": "^7.2.2",
+    "lost": "^8.3.0",
     "megatype": "^1.1.2",
-    "node-sass": "^4.7.2",
-    "opn": "^5.2.0",
-    "optimize-css-assets-webpack-plugin": "^3.2.0",
-    "ora": "^1.4.0",
-    "portfinder": "^1.0.13",
-    "rimraf": "^2.6.0",
-    "sass-loader": "^6.0.6",
-    "semver": "^5.5.0",
-    "shelljs": "^0.7.6",
-    "url-loader": "^0.5.8",
-    "vue-loader": "^13.7.1",
-    "vue-style-loader": "^3.1.2",
-    "vue-template-compiler": "^2.5.13",
-    "webpack": "^3.11.0",
-    "webpack-bundle-analyzer": "^2.10.0",
-    "webpack-dev-middleware": "^1.12.2",
-    "webpack-hot-middleware": "^2.21.0",
-    "webpack-merge": "^4.1.1"
+    "node-sass": "^4.9.0",
+    "sass-loader": "^7.0.1",
+    "vue-template-compiler": "^2.5.17"
   },
-  "engines": {
-    "node": ">= 4.0.0",
-    "npm": ">= 3.0.0"
+  "gitHooks": {
+    "pre-commit": "lint-staged"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ]
+  "lint-staged": {
+    "*.js": [
+      "vue-cli-service lint",
+      "git add"
+    ],
+    "*.vue": [
+      "vue-cli-service lint",
+      "git add"
+    ]
+  }
 }

@@ -90,153 +90,193 @@
 </template>
 
 <script>
-  import { mapActions, mapState } from 'vuex'
-  import firebase from '../../firebase-app'
-  import AttachmentPanel from '../elements/AttachmentsPanel'
-  import RemoteControl from '../elements/RemoteControl'
-  import { log } from '../../helper'
-  import { PlayerArtwork } from '../../models/PlayerArtwork'
-  import { Artwork } from '../../models/ArtworkData'
-  import { Player } from '../../models/Player'
+import { mapActions, mapState } from "vuex";
+import AttachmentPanel from "../elements/AttachmentsPanel";
+import RemoteControl from "../elements/RemoteControl";
+import { log } from "../../helper";
+import { PlayerArtwork } from "../../models/PlayerArtwork";
+import { Artwork } from "../../models/ArtworkData";
+import { Player } from "../../models/Player";
 
-  export default {
-    components: {
-      AttachmentPanel,
-      RemoteControl
-    },
-    created () {
-      this.init()
-    },
+export default {
+  components: {
+    AttachmentPanel,
+    RemoteControl
+  },
+  created() {
+    this.init();
+  },
 
-    data () {
-      return {
-        setupIndex: 0
+  data() {
+    return {
+      setupIndex: 0
+    };
+  },
+
+  computed: {
+    ...mapState(["userAccount", "accountArtwork", "accountPlayers"]),
+
+    sourceDescription() {
+      if (this.setup && this.setup.channels.length) {
+        return this.setup.channels[0].source.toString();
       }
     },
 
-    computed: {
-      ...mapState(['userAccount', 'accountArtwork', 'accountPlayers']),
+    images() {
+      return this.setup ? this.setup.thumbnails : [];
+    },
 
-      sourceDescription () {
-        if (this.setup && this.setup.channels.length) {
-          return this.setup.channels[0].source.toString()
-        }
-      },
+    video() {
+      return this.setup ? this.setup.preview : null;
+    },
 
-      images () {
-        return this.setup ? this.setup.thumbnails : []
-      },
-
-      video () {
-        return this.setup ? this.setup.preview : null
-      },
-
-      setup () {
-        if (this.artwork && this.artwork.setups.length) {
-          return this.artwork.setups[this.setupIndex]
-        } else {
-          return null
-        }
-      },
-
-      accountId () {
-        if (!this.userAccount) {
-          return null
-        }
-        return this.userAccount['.key']
-      },
-      players () {
-        if (this.accountPlayers) {
-          return this.accountPlayers.map(player => Player.fromJson(player)).filter(player => player.connected)
-        }
-        return []
-      },
-      artworkId () {
-        return this.$route.params.id
-      },
-      /**
-       * @return {?Artwork}
-       */
-      artwork () {
-        const getValue = (value) => {
-          if (value == null) {
-            return null
-          }
-          if (value.hasOwnProperty('.value') && value['.value'] === null) {
-            return null
-          }
-          return value
-        }
-        const value = getValue(this.accountArtwork)
-        return value ? Artwork.fromJson(value) : null
-      },
-      preview () {
-        return this.artwork && this.artwork.preview ? this.artwork.preview : null
-      },
-      image () {
-        return this.artwork && this.artwork.image ? this.artwork.image : {
-          displayUrl: null,
-          storageUri: null
-        }
+    setup() {
+      if (this.artwork && this.artwork.setups.length) {
+        return this.artwork.setups[this.setupIndex];
+      } else {
+        return null;
       }
     },
-    methods: {
-      ...mapActions(['setRef']),
 
-      init () {
-        if (this.accountId) {
-          this.setRef({
-            key: 'accountArtwork',
-            ref: firebase.database().ref('accounts/' + this.accountId + '/artworks/' + this.artworkId)
-          })
-          this.setRef({
-            key: 'accountPlayers',
-            ref: firebase.database().ref('accounts/' + this.accountId + '/players')
-          })
+    accountId() {
+      if (!this.userAccount) {
+        return null;
+      }
+      return this.userAccount[".key"];
+    },
+    players() {
+      if (this.accountPlayers) {
+        return this.accountPlayers
+          .map(player => Player.fromJson(player))
+          .filter(player => player.connected);
+      }
+      return [];
+    },
+    artworkId() {
+      return this.$route.params.id;
+    },
+    /**
+     * @return {?Artwork}
+     */
+    artwork() {
+      const getValue = value => {
+        if (value == null) {
+          return null;
         }
-      },
-      launch (player) {
-        if (!this.accountId || !this.artwork) {
-          return
+        if (value.hasOwnProperty(".value") && value[".value"] === null) {
+          return null;
         }
-        const path = 'accounts/' + this.accountId + '/players/' + player.key + '/artwork/'
-        const values = PlayerArtwork.fromArtwork(this.artworkId, this.artwork).toUpdates(path, PlayerArtwork.empty())
-        firebase.database().ref(path).remove().then(() => {
-          return firebase.database().ref().update(values)
-        }).catch(log)
-      },
-      stop (player) {
-        if (!this.accountId || !this.artwork) {
-          return
-        }
-        firebase.database().ref('accounts/' + this.accountId + '/players/' + player.key + '/artwork').remove().catch(log)
-      },
-      sendControl (player, position) {
-        firebase.database().ref('commands/' + player.pin).push({ controlId: '' + position }).catch(log)
-      },
-      togglePublished (published) {
-        if (!this.accountId) {
-          return
-        }
-        const data = { published: published }
-        firebase.database().ref('accounts/' + this.accountId + '/artworks/' + this.artworkId).update(data).catch(log)
-      },
-      removeArtwork () {
-        if (!this.accountId) {
-          return
-        }
-        firebase.database().ref('accounts/' + this.accountId + '/artworks/' + this.artworkId).remove().then(function () {
-          this.$router.push('/artworks')
-        }.bind(this)).catch(log)
+        return value;
+      };
+      const value = getValue(this.accountArtwork);
+      return value ? Artwork.fromJson(value) : null;
+    },
+    preview() {
+      return this.artwork && this.artwork.preview ? this.artwork.preview : null;
+    },
+    image() {
+      return this.artwork && this.artwork.image
+        ? this.artwork.image
+        : {
+            displayUrl: null,
+            storageUri: null
+          };
+    }
+  },
+  methods: {
+    ...mapActions(["setRef"]),
+
+    init() {
+      if (this.accountId) {
+        this.setRef({
+          key: "accountArtwork",
+          ref: this.$firebase
+            .database()
+            .ref("accounts/" + this.accountId + "/artworks/" + this.artworkId)
+        });
+        this.setRef({
+          key: "accountPlayers",
+          ref: this.$firebase
+            .database()
+            .ref("accounts/" + this.accountId + "/players")
+        });
       }
     },
-    watch: {
-      $route () {
-        this.init()
-      },
-      'userAccount' () {
-        this.init()
+    launch(player) {
+      if (!this.accountId || !this.artwork) {
+        return;
       }
+      const path =
+        "accounts/" + this.accountId + "/players/" + player.key + "/artwork/";
+      const values = PlayerArtwork.fromArtwork(
+        this.artworkId,
+        this.artwork
+      ).toUpdates(path, PlayerArtwork.empty());
+      this.$firebase
+        .database()
+        .ref(path)
+        .remove()
+        .then(() => {
+          return this.$firebase
+            .database()
+            .ref()
+            .update(values);
+        })
+        .catch(log);
+    },
+    stop(player) {
+      if (!this.accountId || !this.artwork) {
+        return;
+      }
+      this.$firebase
+        .database()
+        .ref(
+          "accounts/" + this.accountId + "/players/" + player.key + "/artwork"
+        )
+        .remove()
+        .catch(log);
+    },
+    sendControl(player, position) {
+      this.$firebase
+        .database()
+        .ref("commands/" + player.pin)
+        .push({ controlId: "" + position })
+        .catch(log);
+    },
+    togglePublished(published) {
+      if (!this.accountId) {
+        return;
+      }
+      const data = { published: published };
+      this.$firebase
+        .database()
+        .ref("accounts/" + this.accountId + "/artworks/" + this.artworkId)
+        .update(data)
+        .catch(log);
+    },
+    removeArtwork() {
+      if (!this.accountId) {
+        return;
+      }
+      this.$firebase
+        .database()
+        .ref("accounts/" + this.accountId + "/artworks/" + this.artworkId)
+        .remove()
+        .then(
+          function() {
+            this.$router.push("/artworks");
+          }.bind(this)
+        )
+        .catch(log);
+    }
+  },
+  watch: {
+    $route() {
+      this.init();
+    },
+    userAccount() {
+      this.init();
     }
   }
+};
 </script>

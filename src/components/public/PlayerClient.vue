@@ -36,100 +36,108 @@
 </template>
 
 <script>
-  import { mapActions, mapMutations, mapState } from 'vuex'
-  import firebase from '@/firebase-app'
-  import { log } from '../../helper'
-  import RemoteControl from '../elements/RemoteControl'
+import { mapActions, mapMutations, mapState } from "vuex";
+import { log } from "../../helper";
+import RemoteControl from "../elements/RemoteControl";
 
-  export default {
-    name: 'PlayerClient',
-    components: {RemoteControl},
+export default {
+  name: "PlayerClient",
+  components: { RemoteControl },
 
-    computed: {
-      ...mapState(['playerPin']),
+  computed: {
+    ...mapState(["playerPin"]),
 
-      playerId () {
-        return this.$route.params.id
-      },
-      pin () {
-        return this.pin0 + this.pin1 + this.pin2 + this.pin3 + this.pin4 + this.pin5
-      },
-      pinReady () {
-        return this.pin > 100000
-      },
-      artwork () {
-        if (this.playerPin) {
-          return this.playerPin.artwork
+    playerId() {
+      return this.$route.params.id;
+    },
+    pin() {
+      return (
+        this.pin0 + this.pin1 + this.pin2 + this.pin3 + this.pin4 + this.pin5
+      );
+    },
+    pinReady() {
+      return this.pin > 100000;
+    },
+    artwork() {
+      if (this.playerPin) {
+        return this.playerPin.artwork;
+      }
+      return null;
+    },
+    artists() {
+      return Object.keys(this.artwork.artists || {}).map(id => {
+        return { ...this.artwork.artists[id], ...{ ".key": id } };
+      });
+    },
+    controls() {
+      if (this.artwork) {
+        return this.artwork.controls || [];
+      }
+      return [];
+    }
+  },
+  data() {
+    return {
+      pin0: "",
+      pin1: "",
+      pin2: "",
+      pin3: "",
+      pin4: "",
+      pin5: ""
+    };
+  },
+  created() {
+    this.init();
+  },
+  methods: {
+    ...mapActions(["setRef"]),
+    ...mapMutations(["SET_LOADING"]),
+
+    setPin() {
+      this.init();
+    },
+    init() {
+      if (this.$route.params.id > 100000 && this.$route.params.id < 999999) {
+        const value = this.$route.params.id.split("");
+        if (!this.pin0) {
+          this.pin0 = value[0];
         }
-        return null
-      },
-      artists () {
-        return Object.keys(this.artwork.artists || {}).map(id => {
-          return {...this.artwork.artists[id], ...{'.key': id}}
-        })
-      },
-      controls () {
-        if (this.artwork) {
-          return this.artwork.controls || []
+        if (!this.pin1) {
+          this.pin1 = value[1];
         }
-        return []
+        if (!this.pin2) {
+          this.pin2 = value[2];
+        }
+        if (!this.pin3) {
+          this.pin3 = value[3];
+        }
+        if (!this.pin4) {
+          this.pin4 = value[4];
+        }
+        if (!this.pin5) {
+          this.pin5 = value[5];
+        }
+      }
+      if (this.pinReady) {
+        this.SET_LOADING(true);
+        this.setRef({
+          key: "playerPin",
+          ref: this.$firebase.database().ref("player-pins/" + this.pin)
+        });
       }
     },
-    data () {
-      return {
-        pin0: '',
-        pin1: '',
-        pin2: '',
-        pin3: '',
-        pin4: '',
-        pin5: ''
-      }
-    },
-    created () {
-      this.init()
-    },
-    methods: {
-      ...mapActions(['setRef']),
-      ...mapMutations(['SET_LOADING']),
-
-      setPin () {
-        this.init()
-      },
-      init () {
-        if (this.$route.params.id > 100000 && this.$route.params.id < 999999) {
-          const value = this.$route.params.id.split('')
-          if (!this.pin0) {
-            this.pin0 = value[0]
-          }
-          if (!this.pin1) {
-            this.pin1 = value[1]
-          }
-          if (!this.pin2) {
-            this.pin2 = value[2]
-          }
-          if (!this.pin3) {
-            this.pin3 = value[3]
-          }
-          if (!this.pin4) {
-            this.pin4 = value[4]
-          }
-          if (!this.pin5) {
-            this.pin5 = value[5]
-          }
-        }
-        if (this.pinReady) {
-          this.SET_LOADING(true)
-          this.setRef({key: 'playerPin', ref: firebase.database().ref('player-pins/' + this.pin)})
-        }
-      },
-      sendControl (position) {
-        firebase.database().ref('commands/' + this.pin).push({controlId: '' + position}).catch(log)
-      }
-    },
-    watch: {
-      $route () {
-        this.init()
-      }
+    sendControl(position) {
+      this.$firebase
+        .database()
+        .ref("commands/" + this.pin)
+        .push({ controlId: "" + position })
+        .catch(log);
+    }
+  },
+  watch: {
+    $route() {
+      this.init();
     }
   }
+};
 </script>

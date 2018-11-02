@@ -15,36 +15,38 @@
 </template>
 
 <script>
-  import { mapActions, mapState } from 'vuex'
-  import firebase from '../../firebase-app'
+import { mapActions, mapState } from "vuex";
 
-  export default {
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['place']),
+export default {
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["place"]),
 
-      placeId () {
-        return this.$route.params.id
-      },
-      shows () {
-        return Object.keys(this.place.shows || {}).map(id => {
-          return {...this.place.shows[id], ...{'.key': id}}
-        })
-      }
+    placeId() {
+      return this.$route.params.id;
     },
-    methods: {
-      ...mapActions(['setRef']),
+    shows() {
+      return Object.keys(this.place.shows || {}).map(id => {
+        return { ...this.place.shows[id], ...{ ".key": id } };
+      });
+    }
+  },
+  methods: {
+    ...mapActions(["setRef"]),
 
-      init () {
-        this.setRef({key: 'place', ref: firebase.database().ref('places/' + this.placeId)})
-      }
-    },
-    watch: {
-      $route () {
-        this.init()
-      }
+    init() {
+      this.setRef({
+        key: "place",
+        ref: this.$firebase.database().ref("places/" + this.placeId)
+      });
+    }
+  },
+  watch: {
+    $route() {
+      this.init();
     }
   }
+};
 </script>

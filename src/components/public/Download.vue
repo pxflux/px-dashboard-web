@@ -7,34 +7,36 @@
 </template>
 
 <script>
-  import { mapActions, mapState } from 'vuex'
-  import firebase from '@/firebase-app'
+import { mapActions, mapState } from "vuex";
 
-  export default {
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['config']),
+export default {
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["config"]),
 
-      distribute () {
-        if (this.config) {
-          return this.config.distribute
-        }
-        return {macos: {}}
+    distribute() {
+      if (this.config) {
+        return this.config.distribute;
       }
-    },
-    methods: {
-      ...mapActions(['setRef']),
+      return { macos: {} };
+    }
+  },
+  methods: {
+    ...mapActions(["setRef"]),
 
-      init () {
-        this.setRef({key: 'config', ref: firebase.database().ref('config')})
-      }
-    },
-    watch: {
-      $route () {
-        this.init()
-      }
+    init() {
+      this.setRef({
+        key: "config",
+        ref: this.$firebase.database().ref("config")
+      });
+    }
+  },
+  watch: {
+    $route() {
+      this.init();
     }
   }
+};
 </script>

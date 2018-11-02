@@ -16,11 +16,7 @@
 </template>
 
 <script>
-  export default {
-    name: 'output-video-options'
-  }
+export default {
+  name: "output-video-options"
+};
 </script>
-
-<style scoped>
-
-</style>

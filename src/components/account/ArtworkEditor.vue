@@ -59,88 +59,99 @@
 </template>
 
 <script>
-  // SELECTs
-  // https://github.com/sagalbot/vue-select
-  // https://github.com/shentao/vue-multiselect
-  // SORTABLE
-  // https://github.com/Jexordexan/vue-slicksort
-  // https://github.com/hilongjw/vue-dragging *
+// SELECTs
+// https://github.com/sagalbot/vue-select
+// https://github.com/shentao/vue-multiselect
+// SORTABLE
+// https://github.com/Jexordexan/vue-slicksort
+// https://github.com/hilongjw/vue-dragging *
 
-  import { mapActions, mapState } from 'vuex'
-  import firebase from '../../firebase-app'
-  import { Artwork } from '../../models/ArtworkData'
-  import { log } from '../../helper'
+import { mapActions, mapState } from "vuex";
+import { Artwork } from "../../models/ArtworkData";
+import { log } from "../../helper";
 
-  import RemoteControlEditor from '../elements/RemoteControlEditor'
-  import ContributorsEditor from '../elements/ContributorsEditor'
-  import VideoAttachmentEditor from '../elements/VideoAttachmentEditor'
-  import ImageAttachmentEditor from '../elements/ImageAttachmentEditor'
-  import ArtworkSetupEditor from '../elements/ArtworkSetupEditor'
+import RemoteControlEditor from "../elements/RemoteControlEditor";
+import ContributorsEditor from "../elements/ContributorsEditor";
+import ArtworkSetupEditor from "../elements/ArtworkSetupEditor";
 
-  export default {
-    props: ['isNew'],
-    components: {
-      ImageAttachmentEditor,
-      VideoAttachmentEditor,
-      RemoteControlEditor,
-      ContributorsEditor,
-      ArtworkSetupEditor
+export default {
+  props: ["isNew"],
+  components: {
+    // ImageAttachmentEditor,
+    // VideoAttachmentEditor,
+    RemoteControlEditor,
+    ContributorsEditor,
+    ArtworkSetupEditor
+  },
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["userAccount", "accountArtwork"]),
+
+    accountId() {
+      if (!this.userAccount) {
+        return null;
+      }
+      return this.userAccount[".key"];
     },
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['userAccount', 'accountArtwork']),
+    artworkId() {
+      return this.$route.params.id;
+    }
+  },
+  data() {
+    return {
+      artwork: Artwork.empty()
+    };
+  },
+  methods: {
+    ...mapActions(["setRef"]),
 
-      accountId () {
-        if (!this.userAccount) {
-          return null
-        }
-        return this.userAccount['.key']
-      },
-      artworkId () {
-        return this.$route.params.id
+    init() {
+      if (!this.isNew && this.accountId) {
+        this.source = this.$firebase
+          .database()
+          .ref("accounts/" + this.accountId + "/artworks/" + this.artworkId);
+        this.setRef({ key: "accountArtwork", ref: this.source });
+      } else {
+        this.source = null;
       }
     },
-    data () {
-      return {
-        artwork: Artwork.empty()
+    submitArtwork() {
+      if (!this.accountId) {
+        return;
       }
+      const path = "accounts/" + this.accountId + "/artworks/";
+      const id = this.isNew
+        ? this.$firebase
+            .database()
+            .ref(path)
+            .push().key
+        : this.artworkId;
+      const original = this.isNew
+        ? Artwork.empty()
+        : Artwork.fromJson(this.accountArtwork);
+      const values = this.artwork.toUpdates(path + id + "/", original);
+      this.$firebase
+        .database()
+        .ref()
+        .update(values)
+        .then(() => {
+          this.$router.push("/artwork/" + id);
+        })
+        .catch(log());
+    }
+  },
+  watch: {
+    $route() {
+      this.init();
     },
-    methods: {
-      ...mapActions(['setRef']),
-
-      init () {
-        if (!this.isNew && this.accountId) {
-          this.source = firebase.database().ref('accounts/' + this.accountId + '/artworks/' + this.artworkId)
-          this.setRef({key: 'accountArtwork', ref: this.source})
-        } else {
-          this.source = null
-        }
-      },
-      submitArtwork () {
-        if (!this.accountId) {
-          return
-        }
-        const path = 'accounts/' + this.accountId + '/artworks/'
-        const id = this.isNew ? firebase.database().ref(path).push().key : this.artworkId
-        const original = this.isNew ? Artwork.empty() : Artwork.fromJson(this.accountArtwork)
-        const values = this.artwork.toUpdates(path + id + '/', original)
-        firebase.database().ref().update(values).then(() => {
-          this.$router.push('/artwork/' + id)
-        }).catch(log())
-      }
+    userAccount() {
+      this.init();
     },
-    watch: {
-      $route () {
-        this.init()
-      },
-      'userAccount' () {
-        this.init()
-      },
-      'accountArtwork' () {
-        this.artwork = Artwork.fromJson(this.accountArtwork)
-      }
+    accountArtwork() {
+      this.artwork = Artwork.fromJson(this.accountArtwork);
     }
   }
+};
 </script>

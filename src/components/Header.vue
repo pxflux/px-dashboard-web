@@ -7,10 +7,10 @@
           <span class="label beta"></span>
         </div>
       </router-link>
-      <template v-if="!['player-client', 'auth'].includes($route.name)">
+      <template v-if="!['player-client'].includes($route.name)">
         <div class="right">
-          <router-link to="/download" class="button">Download</router-link>
-          <router-link v-if=" ! user" to="/auth" class="button">Login</router-link>
+          <router-link v-if="user" to="/download" class="button">Download</router-link>
+          <div v-if="!user" v-on:click="logIn" class="button">Login</div>
           <!-- -->
           <div v-if="user" class="item-with-submenu">
             <a class="button submenu-trigger" title="Add">
@@ -27,7 +27,7 @@
           </div>
           <!-- -->
           <router-link v-if="user" to="/artworks" class="button">
-            <img src="/static/img/collection-v3@2x.png" width="24" height="24" class="center">
+            <img src="/img/collection-v3@2x.png" width="24" height="24" class="center">
           </router-link>
           <!-- -->
           <div v-if="user" class="item-with-submenu">
@@ -65,86 +65,106 @@
 </template>
 
 <script>
-  import { mapActions, mapState } from 'vuex'
-  import firebaseApp from '../firebase-app'
-  import ScalableCanvasFromImage from '../assets/js/logo'
-  import ColorFlicker from '../assets/js/color-flicker'
-  import SubmenuHelper from '../helpers/submenu'
-  import { log } from '../helper'
+import { mapActions, mapState } from "vuex";
+import ScalableCanvasFromImage from "../assets/js/logo";
+import ColorFlicker from "../assets/js/color-flicker";
+import SubmenuHelper from "../helpers/submenu";
+import { log } from "../helper";
+import Firebase from "firebase/app";
 
-  export default {
-    mixins: [SubmenuHelper],
+export default {
+  mixins: [SubmenuHelper],
 
-    created () {
-      this.init()
-    },
-    computed: {
-      ...mapState(['user', 'userAccount', 'accounts']),
-      inactiveAccounts () {
-        return this.accounts.filter(account => account['.key'] !== this.userAccount['.key'])
-      }
-    },
-    methods: {
-      ...mapActions(['setRef']),
+  created() {
+    this.init();
+  },
+  computed: {
+    ...mapState(["user", "userAccount", "accounts"]),
+    inactiveAccounts() {
+      return this.accounts.filter(
+        account => account[".key"] !== this.userAccount[".key"]
+      );
+    }
+  },
+  methods: {
+    ...mapActions(["setRef"]),
 
-      init () {
-        if (this.user) {
-          this.setRef({
-            key: 'accounts',
-            ref: firebaseApp.database().ref('users/' + this.user.uid + '/accounts')
-          })
-        }
-      },
-
-      setAccount (accountId) {
-        this.closeSubmenus()
-        firebaseApp.database().ref('users/' + this.user.uid + '/accountId').set(accountId).catch(log)
-      },
-
-      goto (path) {
-        this.closeSubmenus()
-        this.$router.push(path)
-      },
-
-      logOut () {
-        firebaseApp.auth().signOut()
-        this.$router.push('/')
-      },
-
-      setFlicker () {
-        this.$nextTick(function () {
-          new ColorFlicker().flickElement()
-        })
+    init() {
+      if (this.user) {
+        this.setRef({
+          key: "accounts",
+          ref: this.$firebase
+            .database()
+            .ref("users/" + this.user.uid + "/accounts")
+        });
       }
     },
 
-    mounted: function () {
-      let logoURL = getLogoURL()
-      const canvasID = 'px-logo'
-      const logo = new ScalableCanvasFromImage(logoURL, canvasID, { fillParent: false })
-      logo.setup()
-      this.setFlicker()
-      this.setupSubmenusWithClass('submenu', 'submenu-trigger')
-      window.addEventListener('resize', function () {
-        logo.setup(getLogoURL())
-      })
+    setAccount(accountId) {
+      this.closeSubmenus();
+      this.$firebase
+        .database()
+        .ref("users/" + this.user.uid + "/accountId")
+        .set(accountId)
+        .catch(log);
+    },
 
-      function getLogoURL () {
-        const el = document.getElementById('px-logo-box')
-        const style = window.getComputedStyle(el)
-        return style.backgroundImage.slice(4, -1).replace(/"/g, '')
-      }
+    goto(path) {
+      this.closeSubmenus();
+      this.$router.push(path);
     },
-    updated: function () {
-      this.setFlicker()
-      this.$nextTick(function () {
-        this.setupSubmenusWithClass('submenu', 'submenu-trigger')
-      })
+
+    logIn() {
+      this.$firebase
+        .auth()
+        .signInWithRedirect(new Firebase.auth.GoogleAuthProvider())
+        .catch(err => console.log(err));
     },
-    watch: {
-      'user' () {
-        this.init()
-      }
+
+    logOut() {
+      this.$router.push("/");
+      this.$firebase
+        .auth()
+        .signOut()
+        .catch(err => console.log(err));
+    },
+
+    setFlicker() {
+      this.$nextTick(function() {
+        new ColorFlicker().flickElement();
+      });
+    }
+  },
+
+  mounted: function() {
+    let logoURL = getLogoURL();
+    const canvasID = "px-logo";
+    const logo = new ScalableCanvasFromImage(logoURL, canvasID, {
+      fillParent: false
+    });
+    logo.setup();
+    this.setFlicker();
+    this.setupSubmenusWithClass("submenu", "submenu-trigger");
+    window.addEventListener("resize", function() {
+      logo.setup(getLogoURL());
+    });
+
+    function getLogoURL() {
+      const el = document.getElementById("px-logo-box");
+      const style = window.getComputedStyle(el);
+      return style.backgroundImage.slice(4, -1).replace(/"/g, "");
+    }
+  },
+  updated: function() {
+    this.setFlicker();
+    this.$nextTick(function() {
+      this.setupSubmenusWithClass("submenu", "submenu-trigger");
+    });
+  },
+  watch: {
+    user() {
+      this.init();
     }
   }
+};
 </script>

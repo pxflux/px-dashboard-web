@@ -1,4 +1,4 @@
-import { User } from './User'
+import { User } from "./User";
 
 /**
  * @property {string} id
@@ -15,38 +15,40 @@ export class Contributor extends User {
    * @param {Attachment} photo
    * @param {number} role
    */
-  constructor (id,
-               displayName,
-               photoUrl,
-               photo,
-               role) {
-    super(id, displayName, photoUrl, photo)
-    this.role = role
+  constructor(id, displayName, photoUrl, photo, role) {
+    super(id, displayName, photoUrl, photo);
+    this.role = role;
   }
 
-  static fromJson (value) {
-    const user = User.fromJson(value)
+  static fromJson(value) {
+    const user = User.fromJson(value);
     if (user === null) {
-      return null
+      return null;
     }
-    return new Contributor(user.id, user.displayName, user.photoUrl, user.photo, value.role)
+    return new Contributor(
+      user.id,
+      user.displayName,
+      user.photoUrl,
+      user.photo,
+      value.role
+    );
   }
 
-  hasMainRole () {
-    return this.role === 0
+  hasMainRole() {
+    return this.role === 0;
   }
 
-  hasImportantRole () {
-    return this.role < 2
+  hasImportantRole() {
+    return this.role < 2;
   }
 }
 
 export class Contributors {
-  static fromJson (value) {
+  static fromJson(value) {
     if (Array.isArray(value)) {
-      return value.map(it => Contributor.fromJson(it))
+      return value.map(it => Contributor.fromJson(it));
     } else {
-      return []
+      return [];
     }
   }
 }

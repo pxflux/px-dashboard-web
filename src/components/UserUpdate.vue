@@ -57,80 +57,86 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
-  import firebase from 'firebase'
-  import firebaseApp from '../firebase-app'
+import { mapState } from "vuex";
+import Firebase from "firebase/app";
 
-  export default {
-    data () {
-      return {
-        displayName: this.$store.state.user.displayName,
-        email: this.$store.state.user.email,
-        password: ''
-      }
+export default {
+  data() {
+    return {
+      displayName: this.$store.state.user.displayName,
+      email: this.$store.state.user.email,
+      password: ""
+    };
+  },
+  computed: {
+    ...mapState(["user"]),
+
+    googleFederated: function() {
+      return this.user.providerData.find(
+        o => o.providerId === Firebase.auth.GoogleAuthProvider.PROVIDER_ID
+      );
     },
-    computed: {
-      ...mapState(['user']),
-      googleFederated: function () {
-        return this.user.providerData.find(o => o.providerId === firebase.auth.GoogleAuthProvider.PROVIDER_ID)
-      },
-      emailFederated: function () {
-        return this.user.providerData.find(o => o.providerId === firebase.auth.EmailAuthProvider.PROVIDER_ID)
-      },
-      multipleAuth: function () {
-        return this.user.providerData.length > 1
-      }
+    emailFederated: function() {
+      return this.user.providerData.find(
+        o => o.providerId === Firebase.auth.EmailAuthProvider.PROVIDER_ID
+      );
     },
-    methods: {
-      updateProfile () {
-        this.user.updateProfile({
+    multipleAuth: function() {
+      return this.user.providerData.length > 1;
+    }
+  },
+  methods: {
+    updateProfile() {
+      this.user
+        .updateProfile({
           displayName: this.displayName,
           email: this.email
-        }).catch(function (error) {
-          console.log('Account linking error', error)
         })
-      },
-      updatePassword () {
-        if (this.emailFederated) {
-          this.user.updatePassword(this.password).catch(function (error) {
-            console.log('Account linking error', error)
+        .catch(error => console.log(error));
+    },
+    updatePassword() {
+      if (this.emailFederated) {
+        this.user
+          .updatePassword(this.password)
+          .then()
+          .catch(error => console.log(error));
+      } else {
+        let credential = Firebase.auth.EmailAuthProvider.credential(
+          this.user.email,
+          this.password
+        );
+        this.user
+          .linkWithCredential(credential)
+          .then(user => {
+            this.$firebase.auth().currentUser.reload();
+            this.$store.commit("UPDATE_USER", { user: user });
           })
-        } else {
-          let credential = firebase.auth.EmailAuthProvider.credential(this.user.email, this.password)
-          this.user.linkWithCredential(credential).then(function (user) {
-            console.log('Account link', user)
-            firebaseApp.auth().currentUser.reload()
-            this.$store.commit('UPDATE_USER', {user: user})
-          }.bind(this), function (error) {
-            console.log('Account linking error', error)
-          })
-        }
-        this.password = ''
-      },
-      disconnectGoogle () {
-        this.user.unlink(firebase.auth.GoogleAuthProvider.PROVIDER_ID)
-          .then(function (user) {
-            console.log('Account unlink', user)
-            firebaseApp.auth().currentUser.reload()
-            this.$store.commit('UPDATE_USER', {user: user})
-          }.bind(this))
-          .catch(function (error) {
-            console.log('Account unlink error', error)
-          })
-      },
-      connectGoogle () {
-        let provider = new firebase.auth.GoogleAuthProvider()
-          .addScope('https://www.googleapis.com/auth/plus.login')
-        this.user.linkWithPopup(provider)
-          .then(function (result) {
-            console.log('Account link', result)
-            firebaseApp.auth().currentUser.reload()
-            this.$store.commit('UPDATE_USER', {user: result.user})
-          }.bind(this))
-          .catch(function (error) {
-            console.log('Account linking error', error)
-          })
+          .catch(error => console.log(error));
       }
+      this.password = "";
+    },
+    disconnectGoogle() {
+      this.user
+        .unlink(Firebase.auth.GoogleAuthProvider.PROVIDER_ID)
+        .then(user => {
+          console.log("Account unlink", user);
+          this.$firebase.auth().currentUser.reload();
+          this.$store.commit("UPDATE_USER", { user: user });
+        })
+        .catch(error => console.log("Account unlink error", error));
+    },
+    connectGoogle() {
+      const provider = new Firebase.auth.GoogleAuthProvider().addScope(
+        "https://www.googleapis.com/auth/plus.login"
+      );
+      this.user
+        .linkWithPopup(provider)
+        .then(result => {
+          this.$firebase.auth().currentUser.reload();
+          this.$store.commit("UPDATE_USER", { user: result.user });
+        })
+        .catch(error => console.log(error));
     }
   }
+};
 </script>

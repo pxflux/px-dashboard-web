@@ -28,69 +28,70 @@
 </template>
 
 <script>
-  export default {
-    name: 'editable-string',
-    props: {
-      value: { default: '', type: String },
-      stringClass: { default: '', type: String },
-      multiLine: { default: false, type: Boolean }
+export default {
+  name: "editable-string",
+  props: {
+    value: { default: "", type: String },
+    stringClass: { default: "", type: String },
+    multiLine: { default: false, type: Boolean }
+  },
+  data() {
+    return {
+      editable: false,
+      backup: this.value
+    };
+  },
+  methods: {
+    makeEditable() {
+      this.backup = this.$refs.txt.innerText;
+      this.editable = true;
+      this.$refs.txt.focus();
+      this.setCaret();
     },
-    data () {
-      return {
-        editable: false,
-        backup: this.value
-      }
+    submit() {
+      this.$emit("input", this.$refs.txt.innerText);
+      this.blur();
     },
-    methods: {
-      makeEditable () {
-        this.backup = this.$refs.txt.innerText
-        this.editable = true
-        this.$refs.txt.focus()
-        this.setCaret()
-      },
-      submit () {
-        this.$emit('input', this.$refs.txt.innerText)
-        this.blur()
-      },
-      cancel () {
-        this.$refs.txt.innerText = this.backup
-        this.blur()
-      },
-      blur () {
-        this.$refs.txt.blur()
-        this.editable = false
-      },
-      setCaret () {
-        const el = this.$refs.txt
-        const range = document.createRange()
-        const sel = window.getSelection()
-        range.setStart(el.childNodes[0], el.innerText.length)
-        range.collapse(true)
-        sel.removeAllRanges()
-        sel.addRange(range)
-        el.focus()
-      }
-
+    cancel() {
+      this.$refs.txt.innerText = this.backup;
+      this.blur();
     },
-    mounted () {
-      this.$refs.txt.innerText = this.value
-      this.$refs.txt.addEventListener('keydown', (e) => {
-        if (!this.multiLine) {
-          if (e.keyCode === 13) { // ENTER
-            this.submit()
-            e.preventDefault()
-          }
+    blur() {
+      this.$refs.txt.blur();
+      this.editable = false;
+    },
+    setCaret() {
+      const el = this.$refs.txt;
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.setStart(el.childNodes[0], el.innerText.length);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      el.focus();
+    }
+  },
+  mounted() {
+    this.$refs.txt.innerText = this.value;
+    this.$refs.txt.addEventListener("keydown", e => {
+      if (!this.multiLine) {
+        if (e.keyCode === 13) {
+          // ENTER
+          this.submit();
+          e.preventDefault();
         }
-        if (e.keyCode === 27) { // ESC
-          this.cancel()
-          e.preventDefault()
-        }
-      })
-    },
-    watch: {
-      value () {
-        this.$refs.txt.innerText = this.value
       }
+      if (e.keyCode === 27) {
+        // ESC
+        this.cancel();
+        e.preventDefault();
+      }
+    });
+  },
+  watch: {
+    value() {
+      this.$refs.txt.innerText = this.value;
     }
   }
+};
 </script>
