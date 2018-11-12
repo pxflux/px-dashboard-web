@@ -347,9 +347,10 @@ export class AWSource {
     if (!this.url) {
       return "The URL is not valid.";
     } else {
+      const resolution = this.resolution ? this.resolution.toString() : "";
       switch (this.type) {
         case "vimeo":
-          return `Vimeo video ${this.resolution.toString()} | [${this.durationToString(
+          return `Vimeo video ${resolution} | [${this.durationToString(
             this.duration
           )}]`;
         default:

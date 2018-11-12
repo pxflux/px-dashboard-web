@@ -19,7 +19,7 @@ export class Player {
   }
 
   /**
-   * @param {object} value
+   * @param {AccountPlayer} value
    */
   static fromJson(value) {
     if (!value || typeof value !== "object") {
