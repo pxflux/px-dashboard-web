@@ -10,11 +10,11 @@
 
       <div v-if="panelOpened" class="outputs-control-panel field">
         <output-control-panel ref="audioOutputControls" code="audio" title="Audio" :data="channel.audioOutputs"
-                              v-on:append="appendOutputs($event)"
-                              v-on:remove="removeOutputs($event)"/>
+                              v-on:append="appendAudioOutputs($event)"
+                              v-on:remove="removeAudioOutputs($event)"/>
         <output-control-panel ref="videoOutputControls" code="video" title="Video" :data="channel.videoOutputs"
-                              v-on:append="appendOutputs($event)"
-                              v-on:remove="removeOutputs($event)"/>
+                              v-on:append="appendVideoOutputs($event)"
+                              v-on:remove="removeVideoOutputs($event)"/>
       </div>
       <div v-else="" class="field closed" @click="panelOpened = !panelOpened">
         <span class="description">{{description}}</span>
@@ -81,7 +81,9 @@ export default {
   },
   mounted() {
     window.addEventListener("resize", () => {
-      this.refreshOutputConnections();
+      if (this.panelOpened) {
+        this.refreshOutputConnections();
+      }
     });
   },
   methods: {
@@ -92,25 +94,21 @@ export default {
       );
       this.refreshOutputConnections();
     },
-    appendOutputs(type) {
-      if (type === "audio") {
-        AWAudioOutputs.append(this.channel.audioOutputs);
-        this.update();
-      }
-      if (type === "video") {
-        AWVideoOutputs.append(this.channel.videoOutputs);
-        this.update();
-      }
+    appendAudioOutputs() {
+      AWAudioOutputs.append(this.channel.audioOutputs);
+      this.update();
     },
-    removeOutputs(type) {
-      if (type === "audio") {
-        AWAudioOutputs.remove(this.channel.audioOutputs);
-        this.update();
-      }
-      if (type === "video") {
-        AWVideoOutputs.remove(this.channel.videoOutputs);
-        this.update();
-      }
+    removeAudioOutputs() {
+      AWAudioOutputs.remove(this.channel.audioOutputs);
+      this.update();
+    },
+    appendVideoOutputs() {
+      AWVideoOutputs.append(this.channel.videoOutputs);
+      this.update();
+    },
+    removeVideoOutputs() {
+      AWVideoOutputs.remove(this.channel.videoOutputs);
+      this.update();
     },
     setVideoOutputs(value) {
       this.channel.videoOutputs = value;
